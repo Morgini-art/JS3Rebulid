@@ -1,0 +1,16 @@
+body {
+    background-color: hsl(120, 100%, 30%);
+    font-family:  monospace;
+}
+#gra {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: lightblue;
+    border-radius: 6px;
+    border: 6px #128a14 solid;
+}
+h1 {
+    font-size: 35px;
+    text-align: center;
+}

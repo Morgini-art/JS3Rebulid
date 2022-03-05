@@ -1,0 +1,131 @@
+//   PX = e.layerX;
+//   PY = e.layerY;
+//   console.log(e.layerX + " " + e.layerY);
+//
+//
+//
+//
+//   //X-------------------------------------------------------
+//   if (menu != "shop" && see_Invetory == false) {
+//       if (x > e.layerX) {
+//
+//           cel = true;
+//           prawo = false;
+//           lewo = true;
+//           dx = speed;
+//           SX = e.layerX;
+//           //console.log("BUM2!!");
+//           direction1 = "left";
+//           PlayerIMG = CHARACTER_LEFT_IMG;
+//       } else if (x < e.layerX) {
+//
+//           cel = true;
+//           lewo = false;
+//           prawo = true;
+//           dx = speed;
+//           //console.log(dx);
+//           SX = e.layerX;
+//           //console.log("BUM!!");
+//           direction1 = "right";
+//           PlayerIMG = CHARACTER_RIGHT_IMG;
+//
+//       }
+//       //X-------------------------------------------------------
+//
+//       //Y-------------------------------------------------------
+//       if (y > e.layerY) {
+//
+//           cel = true;
+//           gora = true;
+//           dol = false;
+//           dy = speed;
+//           SY = e.layerY;
+//           //console.log("BUMy!!");
+//           direction2 = "up";
+//           PlayerIMG = CHARACTER_UP_IMG;
+//       } else if (y < e.layerY) {
+//
+//           cel = true;
+//           gora = false;
+//           dol = true;
+//           dy = speed;
+//           SY = e.layerY;
+//           direction2 = "down";
+//           PlayerIMG = CHARACTER_STAY_IMG;
+//       }
+//       can.addEventListener("click", e => {
+//
+//           }
+//       }
+//
+//   });
+
+        //AXIS Y
+//        switch (playerMovingDirectionAxisY) {
+//    case "Up":
+//        if(playerY!=playerTargetY)
+//        {
+//            playerY -= playerMovingSpeed;
+//            console.log("MAMATRATaetg");
+//        }//250==20 || 250 <=20 || 250 <=0;
+//        if(playerY==playerTargetY||playerY<=playerTargetY||playerY<=0){playerIsMoving=false;}
+//        break;
+//    case "Down":
+//        if(playerY!=playerTargetY)
+//        {
+//            playerY += playerMovingSpeed;
+//            console.log("MAMATRATaet2222g");
+//        }//250==20 || 250 <=20 || 250 <=0;
+//        if(playerY==playerTargetY||playerY>=playerTargetY||playerY>=600){playerIsMoving=false;}
+//        break;
+//    }
+
+//    
+//    if(y<=SY&&gora)
+//        {
+//            dy = 0;
+//            //console.log("MAMATRATaetg");
+//        }
+//        if(gora)
+//        {
+//            y = y -dy;
+////            PlayerIMG = CHARACTER_UP_IMG;
+//        }
+//        if(y>=SY&&dol||y>=580&&dol)
+//            {
+//                dy = 0;
+//                //console.log("MAMATRATaetg");
+//            }
+//        if(dol)
+//            {
+//                y = y + dy;
+////                PlayerIMG = CHARACTER_DOWN_IMG;
+//            }
+//        }
+//    if(x>=SX&&prawo||x>=750&&prawo)
+//        {
+//            dx = 0; 
+////            PlayerIMG = CHARACTER_STAY_IMG;
+//        }
+//        if(prawo)
+//        {
+//            x = x + dx;
+//            PlayerIMG = CHARACTER_RIGHT_IMG;
+//        }
+//        
+//        //
+//        if(x<=SX&&lewo||x<=00&&lewo)
+//            {
+////                PlayerIMG = CHARACTER_STAY_IMG;
+//                dx = 0;
+//                
+//            }
+//        if(lewo)
+//        {
+//            //console.log("L"+ dx);
+////            PlayerIMG = CHARACTER_LEFT_IMG;
+//            x = x  - dx;
+//            
+//        }
+//        
+//        }
