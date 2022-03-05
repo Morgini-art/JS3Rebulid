@@ -24,4 +24,4 @@ function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX
 //    ctx.fillRect(playerX, playerY, 50, 65);
 //}
 
-//export {Enemy};
+export {Enemy};
