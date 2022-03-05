@@ -8,7 +8,7 @@ let Enemy1 = new Enemy(20,20,50,65,35,undefined,undefined,4,0,8,10,'gold',3);
 console.log(Enemy1);
 
 can.addEventListener('click', e => {
-    movingPlayer(e.layerX,e.layerY);
+    movingPlayer(e.offsetX,e.layerY);
 });
 
 

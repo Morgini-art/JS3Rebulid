@@ -1,4 +1,4 @@
-let playerX = 250;
+let playerX = 500;
 let playerY = 250;
 let playerTargetX;
 let playerTargetY;
@@ -15,7 +15,7 @@ function drawPlayer(ctx) {
 }
 
 function movingPlayer(layerX, layerY) {
-//    console.log('Click: x:', layerX, 'y:', layerY);
+    console.log('Click: x:', layerX, 'y:', layerY);
 
     //AxisX
     playerMovingDirectionAxisX = (playerX > layerX) ? playerMovingDirectionAxisX = 'Left' : playerMovingDirectionAxisX = 'Right';
@@ -27,46 +27,38 @@ function movingPlayer(layerX, layerY) {
     //AxisY
     playerIsMovingX = true;
     playerIsMovingY = true;
+    
+    console.log('TargetX: '+playerTargetX,playerTargetY,playerX,playerY);
 }
 
 function playerMove() {
     if (playerIsMovingX) {
         if (playerMovingDirectionAxisX === 'Left') {
-            if (playerX != playerTargetX) {
-                playerX -= playerMovingSpeed;
-            }
-            if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) {
+            playerX -= playerMovingSpeed;
+            if (playerX < playerTargetX) {
                 playerIsMovingX = false;
             }
         }
-        if (playerMovingDirectionAxisX === 'Right') {
-            if (playerX != playerTargetX) {
-                playerX += playerMovingSpeed;
-            }
-            if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) {
+        else if (playerMovingDirectionAxisX === 'Right') {
+            playerX += playerMovingSpeed;
+            if (playerX > playerTargetX && playerX > playerTargetX) {
                 playerIsMovingX = false;
             }
         }
-    }
-
-    if (playerIsMovingY) {
         if (playerMovingDirectionAxisY === 'Up') {
-            if (playerY != playerTargetY) {
-                playerY -= playerMovingSpeed;
-            }
+            playerY -= playerMovingSpeed;
             if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) {
                 playerIsMovingY = false;
             }
         }
         if (playerMovingDirectionAxisY === 'Down') {
-            if (playerY !== playerTargetY) {
-                playerY += playerMovingSpeed;
-            }
+            playerX += playerMovingSpeed;
             if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) {
                 playerIsMovingY = false;
             }
         }
     }
+
 }
 
 setInterval(playerMove, 35);
