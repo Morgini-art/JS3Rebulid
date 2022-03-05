@@ -3,7 +3,6 @@ const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-export {can as mainCanvas};
 
 can.addEventListener('click', e => {
     movingPlayer(e.layerX,e.layerY);
