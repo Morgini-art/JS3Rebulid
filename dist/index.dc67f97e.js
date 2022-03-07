@@ -549,7 +549,7 @@ parcelHelpers.export(exports, "drawPlayer", ()=>drawPlayer
 );
 parcelHelpers.export(exports, "movingPlayer", ()=>movingPlayer
 );
-let playerX = 500;
+let playerX = 250;
 let playerY = 250;
 let playerTargetX;
 let playerTargetY;
@@ -563,7 +563,7 @@ function drawPlayer(ctx) {
     ctx.fillRect(playerX, playerY, 50, 65);
 }
 function movingPlayer(layerX, layerY) {
-    console.log('Click: x:', layerX, 'y:', layerY);
+    //    console.log('Click: x:', layerX, 'y:', layerY);
     //AxisX
     playerMovingDirectionAxisX = playerX > layerX ? playerMovingDirectionAxisX = 'Left' : playerMovingDirectionAxisX = 'Right';
     playerTargetX = layerX;
@@ -577,22 +577,20 @@ function movingPlayer(layerX, layerY) {
     console.log('TargetX: ' + playerTargetX, playerTargetY, playerX, playerY);
 }
 function playerMove() {
-    if (playerIsMovingX) {
+    /*X*/ if (playerIsMovingX) {
         if (playerMovingDirectionAxisX === 'Left') {
             playerX -= playerMovingSpeed;
-            if (playerX < playerTargetX) playerIsMovingX = false;
-        }
-        if (playerMovingDirectionAxisX === 'Right') {
+            if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) playerIsMovingX = false;
+        } else if (playerMovingDirectionAxisX === 'Right') {
             playerX += playerMovingSpeed;
-            if (playerX > playerTargetX && playerX > playerTargetX) playerIsMovingX = false;
+            if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) playerIsMovingX = false;
         }
     }
-    if (playerIsMovingY) {
+    /*Y*/ if (playerIsMovingY) {
         if (playerMovingDirectionAxisY === 'Up') {
             playerY -= playerMovingSpeed;
             if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) playerIsMovingY = false;
-        }
-        if (playerMovingDirectionAxisY === 'Down') {
+        } else if (playerMovingDirectionAxisY === 'Down') {
             playerY += playerMovingSpeed;
             if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) playerIsMovingY = false;
         }

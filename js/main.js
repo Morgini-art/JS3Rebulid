@@ -8,11 +8,7 @@ let enemy1 = new Enemy(20,30,50,65,35,undefined,undefined,4,1,8,10,'gold',3);
 console.log(enemy1.enemyY);
 
 can.addEventListener('click', e => {
-<<<<<<< HEAD
     movingPlayer(e.offsetX,e.offsetY);
-=======
-    movingPlayer(e.layerX,e.layerY);
->>>>>>> parent of 193baf7 (PATCH 0.0.2 FOR Version: 1.0.1)
 });
 
 

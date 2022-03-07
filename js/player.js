@@ -33,63 +33,40 @@ function movingPlayer(layerX, layerY) {
     //AxisY
     playerIsMovingX = true;
     playerIsMovingY = true;
-<<<<<<< HEAD
 
     console.log('TargetX: ' + playerTargetX, playerTargetY, playerX, playerY);
-=======
->>>>>>> parent of 193baf7 (PATCH 0.0.2 FOR Version: 1.0.1)
 }
 
 function playerMove() {
-    if (playerIsMovingX) {
-        if (playerMovingDirectionAxisX === 'Left') {
-            if (playerX != playerTargetX) {
-                playerX -= playerMovingSpeed;
-            }
-            if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) {
-                playerIsMovingX = false;
-            }
-        }
-        if (playerMovingDirectionAxisX === 'Right') {
-<<<<<<< HEAD
-            playerX += playerMovingSpeed;
-            if (playerX > playerTargetX && playerX > playerTargetX) {
-=======
-            if (playerX != playerTargetX) {
-                playerX += playerMovingSpeed;
-            }
-            if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) {
->>>>>>> parent of 193baf7 (PATCH 0.0.2 FOR Version: 1.0.1)
-                playerIsMovingX = false;
-            }
-        }
-    }
-<<<<<<< HEAD
-=======
+   /*X*/
+   if (playerIsMovingX) {
+       if (playerMovingDirectionAxisX === 'Left') {
+           playerX -= playerMovingSpeed;
+           if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) {
+               playerIsMovingX = false;
+           }
+       } else if (playerMovingDirectionAxisX === 'Right') {
+           playerX += playerMovingSpeed;
+           if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) {
+               playerIsMovingX = false;
+           }
+       }
+   }
 
->>>>>>> parent of 193baf7 (PATCH 0.0.2 FOR Version: 1.0.1)
-    if (playerIsMovingY) {
-        if (playerMovingDirectionAxisY === 'Up') {
-            if (playerY != playerTargetY) {
-                playerY -= playerMovingSpeed;
-            }
-            if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) {
-                playerIsMovingY = false;
-            }
-        }
-        if (playerMovingDirectionAxisY === 'Down') {
-<<<<<<< HEAD
-            playerY += playerMovingSpeed;
-=======
-            if (playerY !== playerTargetY) {
-                playerY += playerMovingSpeed;
-            }
->>>>>>> parent of 193baf7 (PATCH 0.0.2 FOR Version: 1.0.1)
-            if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) {
-                playerIsMovingY = false;
-            }
-        }
-    }
+   /*Y*/
+   if (playerIsMovingY) {
+       if (playerMovingDirectionAxisY === 'Up') {
+           playerY -= playerMovingSpeed;
+           if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) {
+               playerIsMovingY = false;
+           }
+       } else if (playerMovingDirectionAxisY === 'Down') {
+           playerY += playerMovingSpeed;
+           if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) {
+               playerIsMovingY = false;
+           }
+       }
+   }
 }
 
 setInterval(playerMove, 35);
