@@ -1,5 +1,8 @@
+import {Hitbox} from './hitbox.js';
 let playerX = 250;
 let playerY = 250;
+let playerWidth = 50;
+let playerHeight = 65;
 let playerTargetX;
 let playerTargetY;
 let playerIsMovingX = false;
@@ -7,12 +10,14 @@ let playerIsMovingY = false;
 let playerMovingSpeed = 6;
 let playerMovingDirectionAxisX;
 let playerMovingDirectionAxisY;
+let playerHitbox = new Hitbox(playerX, playerY, playerWidth, playerHeight);
 
 export {
     playerX,
     playerY,
     drawPlayer,
-    movingPlayer
+    movingPlayer,
+    playerHitbox
 };
 
 function drawPlayer(ctx) {
