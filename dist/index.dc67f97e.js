@@ -525,8 +525,8 @@ const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let enemy1 = new _enemyJs.Enemy(20, 30, 50, 65, 35, undefined, undefined, 4, 1, 8, 10, 'gold', 3);
-console.log(enemy1.enemyY);
+let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, undefined, undefined, 4, 1, 8, 10, 'gold', 3, undefined, 'quest');
+console.log(enemy1.enemySpeed);
 can.addEventListener('click', (e)=>{
     _playerJs.movingPlayer(e.offsetX, e.offsetY);
 });
@@ -536,6 +536,14 @@ function drawAll() {
     _playerJs.drawPlayer(ctx);
     requestAnimationFrame(drawAll);
 }
+function gameLoop() {
+}
+function enemyLoop() {
+    _enemyJs.enemyWherePlayer(enemy1);
+    _enemyJs.enemyMoveToPlayer(enemy1);
+}
+setInterval(gameLoop, 10);
+setInterval(enemyLoop, 35);
 requestAnimationFrame(drawAll);
 
 },{"./player.js":"3yick","./enemy.js":"ey3S5"}],"3yick":[function(require,module,exports) {
@@ -555,7 +563,7 @@ let playerTargetX;
 let playerTargetY;
 let playerIsMovingX = false;
 let playerIsMovingY = false;
-let playerMovingSpeed = 5;
+let playerMovingSpeed = 6;
 let playerMovingDirectionAxisX;
 let playerMovingDirectionAxisY;
 function drawPlayer(ctx) {
@@ -596,7 +604,7 @@ function playerMove() {
         }
     }
 }
-setInterval(playerMove, 35);
+setInterval(playerMove, 30);
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -637,8 +645,10 @@ parcelHelpers.export(exports, "drawEnemy", ()=>drawEnemy
 );
 parcelHelpers.export(exports, "enemyWherePlayer", ()=>enemyWherePlayer
 );
+parcelHelpers.export(exports, "enemyMoveToPlayer", ()=>enemyMoveToPlayer
+);
 var _playerJs = require("./player.js");
-function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX, enemyObjectiveY, enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirection = 'none') {
+function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX, enemyObjectiveY, enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirectionX = 'none', enemyWalkingDirectionY = 'none') {
     this.enemyX = enemyX;
     this.enemyY = enemyY;
     this.enemyWidth = enemyWidth;
@@ -655,54 +665,75 @@ function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX
     //Niewymagane argumenty
     this.enemyIsAlive = enemyIsAlive;
     this.enemyAiState = enemyAiState;
-    this.enemyWalkingDirection = enemyWalkingDirection;
-//Wszystkich argumentów 16
+    this.enemyWalkingDirectionX = enemyWalkingDirectionX;
+    this.enemyWalkingDirectionY = enemyWalkingDirectionY;
+//Wszystkich argumentów 17
 }
 function drawEnemy(ctx, enemyX, enemyY) {
     ctx.fillStyle = 'red';
     ctx.fillRect(enemyX, enemyY, 50, 65);
 }
 function enemyWherePlayer(enemyObject) {
-    enemyObject.enemyWalkingDirection = _playerJs.playerX > enemyObject.enemyX ? enemyObject.enemyWalkingDirection = 'Left' : enemyObject.enemyWalkingDirection = 'Right';
-    enemyObject.enemyObjectiveX = _playerJs.playerX;
-    console.log(enemyObject.enemyWalkingDirection, enemyObject.enemyObjectiveX);
-//    if (x < EX) {
-//        ELEFT = "here";
-//        ERIGHT = "none";
-//        EDX = 4;
-//        EobjectiveX = x;
-//        EnemyIMG = ENEMY_CHARACTER_LEFT_IMG;
-//    }
-//    if (EX < x) {
-//        ELEFT = "none";
-//        ERIGHT = "here";
-//        EDX = 4;
-//        EobjectiveX = x;
-//        //console.log("Right!");
-//    }
-//    if (y > EY) {
-//
-//
-//        EUP = "none";
-//        EDOWN = "here";
-//        EDY = 5;
-//        //console.log("down");
-//
-//        EobjectiveY = y;
-//    }
-//
-//
-//    if (y < EY) {
-//
-//        EUP = "here";
-//        EDOWN = "none";
-//        EDY = 5;
-//
-//        //console.log("up");
-//        EobjectiveY = y;
-//
-//    }
+    if (_playerJs.playerX > enemyObject.enemyX) {
+        enemyObject.enemyWalkingDirectionX = 'Right';
+        enemyObject.enemyObjectiveX = _playerJs.playerX;
+    } else {
+        enemyObject.enemyWalkingDirectionX = 'Left';
+        enemyObject.enemyObjectiveX = _playerJs.playerX;
+    }
+    if (_playerJs.playerY > enemyObject.enemyY) {
+        enemyObject.enemyWalkingDirectionY = 'Down';
+        enemyObject.enemyObjectiveY = _playerJs.playerY;
+    } else {
+        enemyObject.enemyWalkingDirectionY = 'Up';
+        enemyObject.enemyObjectiveY = _playerJs.playerY;
+    }
 }
+function enemyMoveToPlayer(enemyObject) {
+    if (enemyObject.enemyAiState === 'quest') {
+        if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != _playerJs.playerX) enemyObject.enemyX -= enemyObject.enemySpeed;
+        else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != _playerJs.playerX) enemyObject.enemyX += enemyObject.enemySpeed;
+        if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != _playerJs.playerY) enemyObject.enemyY -= enemyObject.enemySpeed;
+        else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != _playerJs.playerY) enemyObject.enemyY += enemyObject.enemySpeed;
+    }
+} //async function EnemyMoveToPlayerY() {
+ //
+ //    if (ESTATE == "quest" && menu != "start") {
+ //        if (EDOWN == "here") {
+ //            EY = EY + EDY;
+ //        }
+ //
+ //        if (EUP == "here") {
+ //            EY = EY - EDY;
+ //        }
+ //
+ //        if (EobjectiveY == EY || EobjectiveY - 1 == EY || EobjectiveY - 2 == EY || EobjectiveY - 3 == EY || EobjectiveY - 4 == EY || EobjectiveY + 1 == EY || EobjectiveY + 2 == EY || EobjectiveY + 3 == EY || EobjectiveY + 4 == EY) {
+ //            EDY = 0;
+ //            EDOWN = "none";
+ //            EUP = "none";
+ //            //console.log(EY);
+ //        }
+ //    }
+ //}
+ //
+ //async function EnemyMoveToPlayerX() {
+ //    if (ESTATE == "quest" && menu != "start") {
+ //        if (ERIGHT == "here") {
+ //            EX = EX + EDX;
+ //        }
+ //
+ //        if (ELEFT == "here") {
+ //            EX = EX - EDX;
+ //        }
+ //
+ //        if (EobjectiveX == EX || EobjectiveX - 1 == EX || EobjectiveX - 2 == EX || EobjectiveX - 3 == EX || EobjectiveX - 4 == EX || EobjectiveX + 1 == EX || EobjectiveX + 2 == EX || EobjectiveX + 3 == EX || EobjectiveX + 4 == EX) {
+ //            EDX = 0;
+ //            ELEFT = "none";
+ //            ERIGHT = "none";
+ //            //console.log(EX);
+ //        }
+ //    }
+ //}    
 
 },{"./player.js":"3yick","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
 

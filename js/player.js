@@ -4,7 +4,7 @@ let playerTargetX;
 let playerTargetY;
 let playerIsMovingX = false;
 let playerIsMovingY = false;
-let playerMovingSpeed = 5;
+let playerMovingSpeed = 6;
 let playerMovingDirectionAxisX;
 let playerMovingDirectionAxisY;
 
@@ -69,4 +69,4 @@ function playerMove() {
    }
 }
 
-setInterval(playerMove, 35);
+setInterval(playerMove, 30);

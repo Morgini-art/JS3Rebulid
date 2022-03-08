@@ -1,5 +1,8 @@
+export {Enemy,drawEnemy,enemyWherePlayer,enemyMoveToPlayer};
+import {playerX, playerY} from './player.js';
+
 function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX, enemyObjectiveY, enemySpeed, enemyDefendChance,
-    enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirection = 'none') {
+    enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirectionX = 'none',enemyWalkingDirectionY = 'none') {
     this.enemyX = enemyX;
     this.enemyY = enemyY;
     this.enemyWidth = enemyWidth;
@@ -16,8 +19,9 @@ function Enemy(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX
     //Niewymagane argumenty
     this.enemyIsAlive = enemyIsAlive;
     this.enemyAiState = enemyAiState;
-    this.enemyWalkingDirection = enemyWalkingDirection;
-    //Wszystkich argumentów 16
+    this.enemyWalkingDirectionX = enemyWalkingDirectionX;
+    this.enemyWalkingDirectionY = enemyWalkingDirectionY;
+    //Wszystkich argumentów 17
 }
 
 function drawEnemy(ctx ,enemyX, enemyY) {
@@ -25,50 +29,79 @@ function drawEnemy(ctx ,enemyX, enemyY) {
     ctx.fillRect(enemyX, enemyY, 50, 65);
 }
 
-export {Enemy,drawEnemy,enemyWherePlayer};
-import {playerX, playerY} from './player.js';
 
 function enemyWherePlayer(enemyObject) {
     
-    enemyObject.enemyWalkingDirection = (playerX > enemyObject.enemyX) ? enemyObject.enemyWalkingDirection = 'Left' : enemyObject.enemyWalkingDirection = 'Right';
-    enemyObject.enemyObjectiveX = playerX;
-    
-    console.log(enemyObject.enemyWalkingDirection, enemyObject.enemyObjectiveX);
-//    if (x < EX) {
-//        ELEFT = "here";
-//        ERIGHT = "none";
-//        EDX = 4;
-//        EobjectiveX = x;
-//        EnemyIMG = ENEMY_CHARACTER_LEFT_IMG;
-//    }
-//    if (EX < x) {
-//        ELEFT = "none";
-//        ERIGHT = "here";
-//        EDX = 4;
-//        EobjectiveX = x;
-//        //console.log("Right!");
-//    }
-//    if (y > EY) {
-//
-//
-//        EUP = "none";
-//        EDOWN = "here";
-//        EDY = 5;
-//        //console.log("down");
-//
-//        EobjectiveY = y;
-//    }
-//
-//
-//    if (y < EY) {
-//
-//        EUP = "here";
-//        EDOWN = "none";
-//        EDY = 5;
-//
-//        //console.log("up");
-//        EobjectiveY = y;
-//
-//    }
+    if (playerX > enemyObject.enemyX) {
+        enemyObject.enemyWalkingDirectionX = 'Right';
+        enemyObject.enemyObjectiveX = playerX;
+    } else {
+        enemyObject.enemyWalkingDirectionX = 'Left';
+        enemyObject.enemyObjectiveX = playerX;
+    }
 
+    if (playerY > enemyObject.enemyY) {
+        enemyObject.enemyWalkingDirectionY = 'Down';
+        enemyObject.enemyObjectiveY = playerY;
+    } else {
+        enemyObject.enemyWalkingDirectionY = 'Up';
+        enemyObject.enemyObjectiveY = playerY;
+    }
 }
+
+function enemyMoveToPlayer(enemyObject) {
+    if (enemyObject.enemyAiState === 'quest') {
+        if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != playerX) {
+            enemyObject.enemyX -= enemyObject.enemySpeed;
+        } else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != playerX) {
+            enemyObject.enemyX += enemyObject.enemySpeed;
+        }
+        
+        if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != playerY) {
+            enemyObject.enemyY -= enemyObject.enemySpeed;
+        } else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != playerY) {
+            enemyObject.enemyY += enemyObject.enemySpeed;
+        }
+    }
+    
+}
+
+
+//async function EnemyMoveToPlayerY() {
+//
+//    if (ESTATE == "quest" && menu != "start") {
+//        if (EDOWN == "here") {
+//            EY = EY + EDY;
+//        }
+//
+//        if (EUP == "here") {
+//            EY = EY - EDY;
+//        }
+//
+//        if (EobjectiveY == EY || EobjectiveY - 1 == EY || EobjectiveY - 2 == EY || EobjectiveY - 3 == EY || EobjectiveY - 4 == EY || EobjectiveY + 1 == EY || EobjectiveY + 2 == EY || EobjectiveY + 3 == EY || EobjectiveY + 4 == EY) {
+//            EDY = 0;
+//            EDOWN = "none";
+//            EUP = "none";
+//            //console.log(EY);
+//        }
+//    }
+//}
+//
+//async function EnemyMoveToPlayerX() {
+//    if (ESTATE == "quest" && menu != "start") {
+//        if (ERIGHT == "here") {
+//            EX = EX + EDX;
+//        }
+//
+//        if (ELEFT == "here") {
+//            EX = EX - EDX;
+//        }
+//
+//        if (EobjectiveX == EX || EobjectiveX - 1 == EX || EobjectiveX - 2 == EX || EobjectiveX - 3 == EX || EobjectiveX - 4 == EX || EobjectiveX + 1 == EX || EobjectiveX + 2 == EX || EobjectiveX + 3 == EX || EobjectiveX + 4 == EX) {
+//            EDX = 0;
+//            ELEFT = "none";
+//            ERIGHT = "none";
+//            //console.log(EX);
+//        }
+//    }
+//}    
