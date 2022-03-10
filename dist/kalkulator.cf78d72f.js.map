@@ -1,0 +1,1 @@
+{"mappings":"SAAS,SAAS,GAClB,CAAC;IACG,OAAO,CAAC,GAAG,CAAC,CAAgB;AAChC,CAAC","sources":["Documents/JS3Rebulid/js/a.js"],"sourcesContent":["function calculate()\r\n{\r\n    console.log('I calculate...');\r\n}"],"names":[],"version":3,"file":"kalkulator.cf78d72f.js.map","sourceRoot":"/__parcel_source_root/"}
