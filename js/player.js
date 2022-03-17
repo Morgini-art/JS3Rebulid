@@ -1,77 +1,110 @@
-import {Hitbox} from './hitbox.js';
-let playerX = 250;
-let playerY = 250;
-let playerWidth = 50;
-let playerHeight = 65;
-let playerTargetX;
-let playerTargetY;
-let playerIsMovingX = false;
-let playerIsMovingY = false;
-let playerMovingSpeed = 6;
-let playerMovingDirectionAxisX;
-let playerMovingDirectionAxisY;
-let playerHitbox = new Hitbox(playerX, playerY, playerWidth, playerHeight);
+import {
+    Hitbox
+} from './hitbox.js';
+
+class Player {
+    constructor(playerX, playerY, playerWidth, playerHeight, playerMovingSpeed, playerHitbox, playerWeapon, playerLife) {
+        this.playerX = playerX;
+        this.playerY = playerY;
+        this.playerWidth = playerWidth;
+        this.playerHeight = playerHeight;
+        this.playerHeight = playerHeight;
+        this.playerMovingSpeed = playerMovingSpeed;
+        this.playerHitbox = playerHitbox;
+        this.playerWeapon = playerWeapon;
+        this.playerLife = playerLife;
+        this.playerMovingDirectionAxisX;
+        this.playerMovingDirectionAxisY;
+        this.playerTargetX;
+        this.playerTargetY;
+        this.playerIsMovingX;
+        this.playerIsMovingY;
+    }
+
+    drawPlayer(ctx) {
+        const {
+            playerX,
+            playerY,
+            playerHeight,
+            playerWidth
+        } = this;
+        ctx.fillStyle = 'green';
+        ctx.fillRect(playerX, playerY, playerHeight, playerWidth);
+    }
+
+    movingPlayer(layerX, layerY) {
+        const {
+            playerX,
+            playerY,
+            playerTargetX,
+            playerTargetY,
+            playerMovingDirectionAxisX,
+            playerMovingDirectionAxisY,
+            playerIsMovingX,
+            playerIsMovingY
+        } = this;
+
+        this.playerMovingDirectionAxisX = (playerX > layerX) ? this.playerMovingDirectionAxisX = 'Left' : this.playerMovingDirectionAxisX = 'Right';
+        this.playerTargetX = layerX;
+
+        this.playerMovingDirectionAxisY = (playerY > layerY) ? this.playerMovingDirectionAxisY = 'Up' : this.playerMovingDirectionAxisY = 'Down';
+        this.playerTargetY = layerY;
+
+        this.playerIsMovingX = true;
+        this.playerIsMovingY = true;
+
+    }
+
+    playerMove() {
+
+        const {
+            playerX,
+            playerY,
+            playerTargetX,
+            playerTargetY,
+            playerMovingDirectionAxisX,
+            playerMovingDirectionAxisY,
+            playerIsMovingX,
+            playerIsMovingY,
+            playerMovingSpeed
+        } = this;
+
+        if (playerIsMovingX) {
+            if (playerMovingDirectionAxisX === 'Left') {
+                this.playerX -= playerMovingSpeed;
+                if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) {
+                    this.playerIsMovingX = false;
+                }
+            } else if (playerMovingDirectionAxisX === 'Right') {
+                this.playerX += playerMovingSpeed;
+                if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) {
+                    this.playerIsMovingX = false;
+                }
+            }
+        }
+
+        if (playerIsMovingY) {
+            if (playerMovingDirectionAxisY === 'Up') {
+                this.playerY -= playerMovingSpeed;
+                if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) {
+                    this.playerIsMovingY = false;
+                }
+            } else if (playerMovingDirectionAxisY === 'Down') {
+                this.playerY += playerMovingSpeed;
+                if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) {
+                    this.playerIsMovingY = false;
+                }
+            }
+        }
+    }
+
+    playerAttack() {
+
+    }
+
+}
 
 export {
-    playerX,
-    playerY,
-    drawPlayer,
-    movingPlayer,
-    playerHitbox
+    playerWeapon,
+    Player
 };
-
-function drawPlayer(ctx) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(playerX, playerY, 50, 65);
-}
-
-function movingPlayer(layerX, layerY) {
-//    console.log('Click: x:', layerX, 'y:', layerY);
-
-    //AxisX
-    playerMovingDirectionAxisX = (playerX > layerX) ? playerMovingDirectionAxisX = 'Left' : playerMovingDirectionAxisX = 'Right';
-    playerTargetX = layerX;
-    //AxisX
-    //AxisY
-    playerMovingDirectionAxisY = (playerY > layerY) ? playerMovingDirectionAxisY = 'Up' : playerMovingDirectionAxisY = 'Down';
-    playerTargetY = layerY;
-    //AxisY
-    playerIsMovingX = true;
-    playerIsMovingY = true;
-
-    console.log('TargetX: ' + playerTargetX, playerTargetY, playerX, playerY);
-}
-
-function playerMove() {
-   /*X*/
-   if (playerIsMovingX) {
-       if (playerMovingDirectionAxisX === 'Left') {
-           playerX -= playerMovingSpeed;
-           if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) {
-               playerIsMovingX = false;
-           }
-       } else if (playerMovingDirectionAxisX === 'Right') {
-           playerX += playerMovingSpeed;
-           if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) {
-               playerIsMovingX = false;
-           }
-       }
-   }
-
-   /*Y*/
-   if (playerIsMovingY) {
-       if (playerMovingDirectionAxisY === 'Up') {
-           playerY -= playerMovingSpeed;
-           if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) {
-               playerIsMovingY = false;
-           }
-       } else if (playerMovingDirectionAxisY === 'Down') {
-           playerY += playerMovingSpeed;
-           if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) {
-               playerIsMovingY = false;
-           }
-       }
-   }
-}
-
-setInterval(playerMove, 30);

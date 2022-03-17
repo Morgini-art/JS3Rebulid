@@ -14,7 +14,7 @@
 
     <h3>Broń</h3>
     Nazwa
-    <input type="text"  value='Sztylet'><br>
+    <input type="text"  value='Sztylet' id='name'><br>
     Min-Dmg
     <input type="text" id='min-dmg' value='6'>
     Max-Dmg
@@ -39,7 +39,8 @@
     <br>
     <input type="text" id='armor' disabled><br>
     
-        <button onclick='calculate()'>Oblicz</button>
+    <button onclick='calculate()'>Oblicz</button>
+    <button onclick='calculate(true)'>Develop Mode</button>
 
     <p id='resultsbox'>Wynik Pojawi się tutaj</p>
     <a href='index.html'>Powrót do gry</a>

@@ -1,16 +1,16 @@
-import {playerX, playerY} from './player.js';
-export {Enemy,drawEnemy,enemyWherePlayer,enemyMoveToPlayer};
+import {playerX, playerY, playerLife} from './player.js';
+import {trialEnemyAttackTime} from './main.js';
+export {Enemy,drawEnemy,enemyWherePlayer,enemyMoveToPlayer,enemyAi};
 
 class Enemy {
-    constructor(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX, enemyObjectiveY, enemySpeed, enemyDefendChance,
-        enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirectionX = 'none', enemyWalkingDirectionY = 'none') {
+    constructor(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp,enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount,enemyWeapon) {
         this.enemyX = enemyX;
         this.enemyY = enemyY;
         this.enemyWidth = enemyWidth;
         this.enemyHeight = enemyHeight;
         this.enemyHp = enemyHp;
-        this.enemyObjectiveX = enemyObjectiveX;
-        this.enemyObjectiveY = enemyObjectiveY;
+        this.enemyObjectiveX
+        this.enemyObjectiveY
         this.enemySpeed = enemySpeed;
         this.enemyDefendChance = enemyDefendChance;
         this.enemyMinDmg = enemyMinDmg;
@@ -18,10 +18,11 @@ class Enemy {
         this.enemyDrop = enemyDrop;
         this.enemyDropAmount = enemyDropAmount;
         //Niewymagane argumenty
-        this.enemyIsAlive = enemyIsAlive;
-        this.enemyAiState = enemyAiState;
-        this.enemyWalkingDirectionX = enemyWalkingDirectionX;
-        this.enemyWalkingDirectionY = enemyWalkingDirectionY;
+        this.enemyIsAlive = true;
+        this.enemyAiState = 'quest';
+        this.enemyWalkingDirectionX = 'none';
+        this.enemyWalkingDirectionY = 'none';
+        this.enemyAttackTime;
         //Wszystkich argumentów 17
     }
 }
@@ -31,62 +32,56 @@ function drawEnemy(ctx ,enemyX, enemyY) {
     ctx.fillRect(enemyX, enemyY, 50, 65);
 }
 
-function enemyWherePlayer(enemyObject) {
+function enemyWherePlayer(enemyObject, playerObject) {
     
-    if (playerX > enemyObject.enemyX) {
+    if (playerObject.playerX > enemyObject.enemyX) {
         enemyObject.enemyWalkingDirectionX = 'Right';
-        enemyObject.enemyObjectiveX = playerX;
+        enemyObject.enemyObjectiveX = playerObject.playerX;
     } else {
         enemyObject.enemyWalkingDirectionX = 'Left';
-        enemyObject.enemyObjectiveX = playerX;
+        enemyObject.enemyObjectiveX = playerObject.playerX;
     }
 
-    if (playerY > enemyObject.enemyY) {
+    if (playerObject.playerY > enemyObject.enemyY) {
         enemyObject.enemyWalkingDirectionY = 'Down';
-        enemyObject.enemyObjectiveY = playerY;
+        enemyObject.enemyObjectiveY = playerObject.playerY;
     } else {
         enemyObject.enemyWalkingDirectionY = 'Up';
-        enemyObject.enemyObjectiveY = playerY;
+        enemyObject.enemyObjectiveY = playerObject.playerY;
     }
 }
 
-function enemyMoveToPlayer(enemyObject) {
-    if (enemyObject.enemyAiState === 'quest') {
-        if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != playerX) {
-            enemyObject.enemyX -= enemyObject.enemySpeed;
-        } else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != playerX) {
-            enemyObject.enemyX += enemyObject.enemySpeed;
-        }
-        
-        if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != playerY) {
-            enemyObject.enemyY -= enemyObject.enemySpeed;
-        } else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != playerY) {
-            enemyObject.enemyY += enemyObject.enemySpeed;
-        }
+function enemyMoveToPlayer(enemyObject, playerObject) {
+    if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != playerObject.playerX) {
+        enemyObject.enemyX -= enemyObject.enemySpeed;
+    } else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != playerObject.playerX) {
+        enemyObject.enemyX += enemyObject.enemySpeed;
     }
-    
+
+    if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != playerObject.playerY) {
+        enemyObject.enemyY -= enemyObject.enemySpeed;
+    } else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != playerObject.playerY) {
+        enemyObject.enemyY += enemyObject.enemySpeed;
+    }
 }
 
-//function ColisionWithPlayer()
-//    {
-//        if(x + szer < EX||
-//             EX + ESZER < x||
-//             y  + wys < EY||
-//            EY + EWYS < y)
-//            {
-//                ESTATE = "quest";
-//                ESTATE2 = "none";
-//                kolizja = false;
-//            }
-//        else
-//        {
-//            kolizja = true;
-//            if(ESTATE2!="attack" && ESTATE2!="wait")
-//            {
-//                ESTATE2 = "readyattack";
-//                //console.log(ESTATE);
-//            }
-//                
-//        }
-//    }
-//    var kolizja = false;
+function enemyAi(enemyObject, attackList, attackTime1, playerLife, playerObject) {
+    var attackTime = enemyObject.enemyAttackTime;
+    if (enemyObject.enemyIsAlive) {
+        enemyWherePlayer(enemyObject, playerObject);
+        if (enemyObject.enemyAiState === 'quest') {
+            enemyMoveToPlayer(enemyObject, playerObject);
+            attackList.pop();
+        } else if (enemyObject.enemyAiState === 'toattack') {
+            if (attackList[attackList.length - 1] == null) {
+                attackList.push('EnemyLightAttack');
+            }
+            if (attackTime <= 0) {
+                attackList.pop();
+                //console.log('Attack!');
+                playerLife = 2;
+                enemyObject.enemyAttackTime = enemyObject.enemyWeapon.weaponSpeedLightAttack;
+            }
+        }
+    }
+}

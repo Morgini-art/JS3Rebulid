@@ -1,5 +1,5 @@
 body {
-    background-color: hsl(120, 100%, 30%);
+    background-color: #5798ba;
     font-family: monospace;
     text-align: center;
     font-size: 18px;
@@ -11,7 +11,7 @@ body {
     margin-right: auto;
     background-color: lightblue;
     border-radius: 6px;
-    border: 6px #128a14 solid;
+    border: 6px #5798ba solid;
 }
 
 h1 {
@@ -32,13 +32,13 @@ input {
     margin: auto;
     width: 120px;
     display: inline-block;
-    background-color: hsl(120, 100%, 30%);
+    background-color: #5798ba;
     border: 1px solid black;
 }
 
 button {
     margin-top: 15px;
-    background-color: hsl(120, 100%, 30%);
+    background-color: #5798ba;
     border: 1px solid black;
     width: 60px;
     height: 35px;

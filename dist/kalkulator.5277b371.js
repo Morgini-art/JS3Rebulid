@@ -1,3 +1,4 @@
+let name;
 let minDmg;
 let maxDmg;
 let weight;
@@ -8,9 +9,13 @@ let resultsBox;
 let armor = false;
 let armorInput = document.getElementById('armor');
 let armorValue;
-function calculate() {
+let oldData;
+let newData;
+let outData;
+function calculate(developMode = false) {
     //    console.log('I calculate...');
     //Weapon
+    name = document.getElementById('name').value;
     minDmg = document.getElementById('min-dmg').value;
     maxDmg = document.getElementById('max-dmg').value;
     weight = document.getElementById('weight').value;
@@ -33,8 +38,15 @@ function calculate() {
     if (armor) var realSpeedLightAttack = speedLightAttack + weight * 100 / agility + armorValue * 100 / strength;
     else var realSpeedLightAttack = speedLightAttack + weight * 100 / agility;
     var realEnergyLightAttack = energyLightAttack + weight * 2 / energy;
-    resultsbox.innerHTML = `<h3>Wynik:</h3>` + `MinDMG:` + realminDmg + `<br>MaxDMG:` + realmaxDmg + `<br>` + `Szybkość Lekkiego Ataku:` + realSpeedLightAttack + `<br>` + `Energia - Lekki Atak:` + realEnergyLightAttack;
-//    console.log(speedLightAttack+1);
+    outData = `<h3>Wynik:</h3>` + `MinDMG:` + realminDmg + `<br>MaxDMG:` + realmaxDmg + `<br>` + `Szybkość Lekkiego Ataku:` + realSpeedLightAttack + `<br>` + `Energia - Lekki Atak:` + realEnergyLightAttack;
+    //    console.log(speedLightAttack+1);
+    if (developMode) {
+        console.log('Develop Mode it is turned on');
+        var name2 = "'" + name + "'";
+        console.log(name2);
+        outData += '<br>Kod:<br>new Weapon(' + name2 + ',' + minDmg + ',' + maxDmg + ',' + weight + ',' + energyLightAttack + ',' + speedLightAttack + ')';
+    }
+    resultsbox.innerHTML = outData;
 }
 function changeArmor() {
     var doneIcon = document.getElementById('doneicon');

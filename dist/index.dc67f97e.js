@@ -519,120 +519,141 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"e0TrB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "trialEnemyAttackTime", ()=>trialEnemyAttackTime
+);
 var _playerJs = require("./player.js");
 var _enemyJs = require("./enemy.js");
+var _weaponJs = require("./weapon.js");
 var _hitboxJs = require("./hitbox.js");
 const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, undefined, undefined, 4, 1, 8, 10, 'gold', 3, undefined, 'quest');
-console.log(enemy1.enemySpeed);
+const trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 750), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
+let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 8, 10, 'gold', 3);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.enemyX, enemy1.enemyY, enemy1.enemyWidth, enemy1.enemyHeight);
+let player1 = new _playerJs.Player(250, 250, 65, 50, 5, new _hitboxJs.Hitbox, trialWeapon1, 100);
+playerWeapon = trialWeapon2;
+console.log(enemy1);
+player1.playerHitbox = new _hitboxJs.Hitbox(player1.playerX, player1.playerY, player1.playerWidth, player1.playerHeight1);
+let attackList = [];
+enemy1.enemyWeapon = trialWeapon2;
+enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
+let trialEnemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
 can.addEventListener('click', (e)=>{
-    _playerJs.movingPlayer(e.offsetX, e.offsetY);
+    player1.movingPlayer(e.offsetX, e.offsetY);
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     _enemyJs.drawEnemy(ctx, enemy1.enemyX, enemy1.enemyY);
-    _playerJs.drawPlayer(ctx);
+    player1.drawPlayer(ctx);
     requestAnimationFrame(drawAll);
+}
+function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
+    ctx.fillStyle = fontColor;
+    ctx.font = fontSize + 'px ' + fontFamily;
+    ctx.fillText(textToDisplay, textX, textY);
 }
 function gameLoop() {
     updateHitboxs();
-    if (_playerJs.playerHitbox.hitboxCollision(enemyHitbox)) console.log('Kolizja!');
+    if (player1.playerHitbox.hitboxCollision(enemyHitbox)) enemy1.enemyAiState = 'toattack';
+    else {
+        enemy1.enemyAiState = 'quest';
+        attackList.pop();
+        enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
+    }
 }
 function updateHitboxs() {
-    _playerJs.playerHitbox.hitboxX = _playerJs.playerX;
-    _playerJs.playerHitbox.hitboxY = _playerJs.playerY;
+    player1.playerHitbox.hitboxX = player1.playerX;
+    player1.playerHitbox.hitboxY = player1.playerY;
     enemyHitbox.hitboxX = enemy1.enemyX;
     enemyHitbox.hitboxY = enemy1.enemyY;
 }
 function enemyLoop() {
-    _enemyJs.enemyWherePlayer(enemy1);
-    _enemyJs.enemyMoveToPlayer(enemy1);
+    _enemyJs.enemyAi(enemy1, attackList, enemy1.enemyAttackTime, undefined, player1);
+}
+function enemyAttackTimer(attackList1) {
+    //console.log(attackList[0]);
+    if (attackList1[attackList1.length - 1] === 'EnemyLightAttack') enemy1.enemyAttackTime -= 20;
 }
 setInterval(gameLoop, 10);
+setInterval(enemyAttackTimer, 20, attackList);
 setInterval(enemyLoop, 35);
+setInterval(player1.playerMove, 30);
 requestAnimationFrame(drawAll);
 
-},{"./player.js":"3yick","./enemy.js":"ey3S5","./hitbox.js":"5AMNB"}],"3yick":[function(require,module,exports) {
+},{"./player.js":"3yick","./enemy.js":"ey3S5","./weapon.js":"ihCsK","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "playerX", ()=>playerX
+parcelHelpers.export(exports, "playerWeapon", ()=>playerWeapon
 );
-parcelHelpers.export(exports, "playerY", ()=>playerY
-);
-parcelHelpers.export(exports, "drawPlayer", ()=>drawPlayer
-);
-parcelHelpers.export(exports, "movingPlayer", ()=>movingPlayer
-);
-parcelHelpers.export(exports, "playerHitbox", ()=>playerHitbox
+parcelHelpers.export(exports, "Player", ()=>Player
 );
 var _hitboxJs = require("./hitbox.js");
-let playerX = 250;
-let playerY = 250;
-let playerWidth = 50;
-let playerHeight = 65;
-let playerTargetX;
-let playerTargetY;
-let playerIsMovingX = false;
-let playerIsMovingY = false;
-let playerMovingSpeed = 6;
-let playerMovingDirectionAxisX;
-let playerMovingDirectionAxisY;
-let playerHitbox = new _hitboxJs.Hitbox(playerX, playerY, playerWidth, playerHeight);
-function drawPlayer(ctx) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(playerX, playerY, 50, 65);
-}
-function movingPlayer(layerX, layerY) {
-    //    console.log('Click: x:', layerX, 'y:', layerY);
-    //AxisX
-    playerMovingDirectionAxisX = playerX > layerX ? playerMovingDirectionAxisX = 'Left' : playerMovingDirectionAxisX = 'Right';
-    playerTargetX = layerX;
-    //AxisX
-    //AxisY
-    playerMovingDirectionAxisY = playerY > layerY ? playerMovingDirectionAxisY = 'Up' : playerMovingDirectionAxisY = 'Down';
-    playerTargetY = layerY;
-    //AxisY
-    playerIsMovingX = true;
-    playerIsMovingY = true;
-    console.log('TargetX: ' + playerTargetX, playerTargetY, playerX, playerY);
-}
-function playerMove() {
-    /*X*/ if (playerIsMovingX) {
-        if (playerMovingDirectionAxisX === 'Left') {
-            playerX -= playerMovingSpeed;
-            if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) playerIsMovingX = false;
-        } else if (playerMovingDirectionAxisX === 'Right') {
-            playerX += playerMovingSpeed;
-            if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) playerIsMovingX = false;
+class Player {
+    constructor(playerX, playerY, playerWidth, playerHeight, playerMovingSpeed, playerHitbox, playerWeapon, playerLife){
+        this.playerX = playerX;
+        this.playerY = playerY;
+        this.playerWidth = playerWidth;
+        this.playerHeight = playerHeight;
+        this.playerHeight = playerHeight;
+        this.playerMovingSpeed = playerMovingSpeed;
+        this.playerHitbox = playerHitbox;
+        this.playerWeapon = playerWeapon;
+        this.playerLife = playerLife;
+        this.playerMovingDirectionAxisX;
+        this.playerMovingDirectionAxisY;
+        this.playerTargetX;
+        this.playerTargetY;
+        this.playerIsMovingX;
+        this.playerIsMovingY;
+    }
+    drawPlayer(ctx) {
+        const { playerX , playerY , playerHeight , playerWidth  } = this;
+        ctx.fillStyle = 'green';
+        ctx.fillRect(playerX, playerY, playerHeight, playerWidth);
+    }
+    movingPlayer(layerX, layerY) {
+        const { playerX , playerY , playerTargetX , playerTargetY , playerMovingDirectionAxisX , playerMovingDirectionAxisY , playerIsMovingX , playerIsMovingY  } = this;
+        this.playerMovingDirectionAxisX = playerX > layerX ? this.playerMovingDirectionAxisX = 'Left' : this.playerMovingDirectionAxisX = 'Right';
+        this.playerTargetX = layerX;
+        this.playerMovingDirectionAxisY = playerY > layerY ? this.playerMovingDirectionAxisY = 'Up' : this.playerMovingDirectionAxisY = 'Down';
+        this.playerTargetY = layerY;
+        this.playerIsMovingX = true;
+        this.playerIsMovingY = true;
+    }
+    playerMove() {
+        const { playerX , playerY , playerTargetX , playerTargetY , playerMovingDirectionAxisX , playerMovingDirectionAxisY , playerIsMovingX , playerIsMovingY , playerMovingSpeed  } = this;
+        if (playerIsMovingX) {
+            if (playerMovingDirectionAxisX === 'Left') {
+                this.playerX -= playerMovingSpeed;
+                if (playerX == playerTargetX || playerX <= playerTargetX || playerX <= 0) this.playerIsMovingX = false;
+            } else if (playerMovingDirectionAxisX === 'Right') {
+                this.playerX += playerMovingSpeed;
+                if (playerX == playerTargetX || playerX >= playerTargetX || playerX >= 780) this.playerIsMovingX = false;
+            }
+        }
+        if (playerIsMovingY) {
+            if (playerMovingDirectionAxisY === 'Up') {
+                this.playerY -= playerMovingSpeed;
+                if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) this.playerIsMovingY = false;
+            } else if (playerMovingDirectionAxisY === 'Down') {
+                this.playerY += playerMovingSpeed;
+                if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) this.playerIsMovingY = false;
+            }
         }
     }
-    /*Y*/ if (playerIsMovingY) {
-        if (playerMovingDirectionAxisY === 'Up') {
-            playerY -= playerMovingSpeed;
-            if (playerY === playerTargetY || playerY <= playerTargetY || playerY <= 0) playerIsMovingY = false;
-        } else if (playerMovingDirectionAxisY === 'Down') {
-            playerY += playerMovingSpeed;
-            if (playerY === playerTargetY || playerY >= playerTargetY || playerY >= 630) playerIsMovingY = false;
-        }
+    playerAttack() {
     }
 }
-setInterval(playerMove, 30);
 
 },{"./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
-) //entity1,entity2) {
- //      return !(entity1.x + entity1.width < entity2.x ||
- //               entity2.x + entity2.width < entity1.x ||
- //               entity1.y + entity1.height < entity2.y ||
- //               entity2.y + entity2.height < entity1.y);
- //    }
-;
+);
 class Hitbox {
     constructor(hitboxX, hitboxY, hitboxWidth, hitboxHeight){
         this.hitboxX = hitboxX;
@@ -641,7 +662,7 @@ class Hitbox {
         this.hitboxHeight = hitboxHeight;
     }
     hitboxCollision(Hitbox1) {
-        if (this.hitboxX + this.hitboxWidth < Hitbox1.hitboxX || Hitbox1.hitboxX + Hitbox1.hitboxWidth < this.hitboxX || this.hitboxY + this.hitboxHeight < Hitbox1.hitboxY || this.hitboxY + Hitbox1.hitboxHeight < this.hitboxY) return false;
+        if (this.hitboxX + this.hitboxWidth < Hitbox1.hitboxX || Hitbox1.hitboxX + Hitbox1.hitboxWidth < this.hitboxX || this.hitboxY + this.hitboxHeight < Hitbox1.hitboxY || Hitbox1.hitboxY + Hitbox1.hitboxHeight < this.hitboxY) return false;
         else return true;
     }
 }
@@ -687,16 +708,19 @@ parcelHelpers.export(exports, "enemyWherePlayer", ()=>enemyWherePlayer
 );
 parcelHelpers.export(exports, "enemyMoveToPlayer", ()=>enemyMoveToPlayer
 );
+parcelHelpers.export(exports, "enemyAi", ()=>enemyAi
+);
 var _playerJs = require("./player.js");
+var _mainJs = require("./main.js");
 class Enemy {
-    constructor(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemyObjectiveX, enemyObjectiveY, enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyIsAlive = true, enemyAiState = 'none', enemyWalkingDirectionX = 'none', enemyWalkingDirectionY = 'none'){
+    constructor(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp, enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount, enemyWeapon){
         this.enemyX = enemyX;
         this.enemyY = enemyY;
         this.enemyWidth = enemyWidth;
         this.enemyHeight = enemyHeight;
         this.enemyHp = enemyHp;
-        this.enemyObjectiveX = enemyObjectiveX;
-        this.enemyObjectiveY = enemyObjectiveY;
+        this.enemyObjectiveX;
+        this.enemyObjectiveY;
         this.enemySpeed = enemySpeed;
         this.enemyDefendChance = enemyDefendChance;
         this.enemyMinDmg = enemyMinDmg;
@@ -704,10 +728,11 @@ class Enemy {
         this.enemyDrop = enemyDrop;
         this.enemyDropAmount = enemyDropAmount;
         //Niewymagane argumenty
-        this.enemyIsAlive = enemyIsAlive;
-        this.enemyAiState = enemyAiState;
-        this.enemyWalkingDirectionX = enemyWalkingDirectionX;
-        this.enemyWalkingDirectionY = enemyWalkingDirectionY;
+        this.enemyIsAlive = true;
+        this.enemyAiState = 'quest';
+        this.enemyWalkingDirectionX = 'none';
+        this.enemyWalkingDirectionY = 'none';
+        this.enemyAttackTime;
     //Wszystkich argumentów 17
     }
 }
@@ -715,53 +740,63 @@ function drawEnemy(ctx, enemyX, enemyY) {
     ctx.fillStyle = 'red';
     ctx.fillRect(enemyX, enemyY, 50, 65);
 }
-function enemyWherePlayer(enemyObject) {
-    if (_playerJs.playerX > enemyObject.enemyX) {
+function enemyWherePlayer(enemyObject, playerObject) {
+    if (playerObject.playerX > enemyObject.enemyX) {
         enemyObject.enemyWalkingDirectionX = 'Right';
-        enemyObject.enemyObjectiveX = _playerJs.playerX;
+        enemyObject.enemyObjectiveX = playerObject.playerX;
     } else {
         enemyObject.enemyWalkingDirectionX = 'Left';
-        enemyObject.enemyObjectiveX = _playerJs.playerX;
+        enemyObject.enemyObjectiveX = playerObject.playerX;
     }
-    if (_playerJs.playerY > enemyObject.enemyY) {
+    if (playerObject.playerY > enemyObject.enemyY) {
         enemyObject.enemyWalkingDirectionY = 'Down';
-        enemyObject.enemyObjectiveY = _playerJs.playerY;
+        enemyObject.enemyObjectiveY = playerObject.playerY;
     } else {
         enemyObject.enemyWalkingDirectionY = 'Up';
-        enemyObject.enemyObjectiveY = _playerJs.playerY;
+        enemyObject.enemyObjectiveY = playerObject.playerY;
     }
 }
-function enemyMoveToPlayer(enemyObject) {
-    if (enemyObject.enemyAiState === 'quest') {
-        if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != _playerJs.playerX) enemyObject.enemyX -= enemyObject.enemySpeed;
-        else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != _playerJs.playerX) enemyObject.enemyX += enemyObject.enemySpeed;
-        if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != _playerJs.playerY) enemyObject.enemyY -= enemyObject.enemySpeed;
-        else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != _playerJs.playerY) enemyObject.enemyY += enemyObject.enemySpeed;
+function enemyMoveToPlayer(enemyObject, playerObject) {
+    if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != playerObject.playerX) enemyObject.enemyX -= enemyObject.enemySpeed;
+    else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != playerObject.playerX) enemyObject.enemyX += enemyObject.enemySpeed;
+    if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != playerObject.playerY) enemyObject.enemyY -= enemyObject.enemySpeed;
+    else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != playerObject.playerY) enemyObject.enemyY += enemyObject.enemySpeed;
+}
+function enemyAi(enemyObject, attackList, attackTime1, playerLife, playerObject) {
+    var attackTime = enemyObject.enemyAttackTime;
+    if (enemyObject.enemyIsAlive) {
+        enemyWherePlayer(enemyObject, playerObject);
+        if (enemyObject.enemyAiState === 'quest') {
+            enemyMoveToPlayer(enemyObject, playerObject);
+            attackList.pop();
+        } else if (enemyObject.enemyAiState === 'toattack') {
+            if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
+            if (attackTime <= 0) {
+                attackList.pop();
+                //console.log('Attack!');
+                playerLife = 2;
+                enemyObject.enemyAttackTime = enemyObject.enemyWeapon.weaponSpeedLightAttack;
+            }
+        }
     }
-} //function ColisionWithPlayer()
- //    {
- //        if(x + szer < EX||
- //             EX + ESZER < x||
- //             y  + wys < EY||
- //            EY + EWYS < y)
- //            {
- //                ESTATE = "quest";
- //                ESTATE2 = "none";
- //                kolizja = false;
- //            }
- //        else
- //        {
- //            kolizja = true;
- //            if(ESTATE2!="attack" && ESTATE2!="wait")
- //            {
- //                ESTATE2 = "readyattack";
- //                //console.log(ESTATE);
- //            }
- //                
- //        }
- //    }
- //    var kolizja = false;
+}
 
-},{"./player.js":"3yick","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
+},{"./player.js":"3yick","./main.js":"e0TrB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Weapon", ()=>Weapon
+);
+class Weapon {
+    constructor(weaponName, weaponMinDmg, weaponMaxDmg, weaponWeight, weaponEnergyLightAttack, weaponSpeedLightAttack){
+        this.weaponName = weaponName;
+        this.weaponMinDmg = weaponMinDmg;
+        this.weaponMaxDmg = weaponMaxDmg;
+        this.weaponWeight = weaponWeight;
+        this.weaponEnergyLightAttack = weaponEnergyLightAttack;
+        this.weaponSpeedLightAttack = weaponSpeedLightAttack;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
 
 //# sourceMappingURL=index.dc67f97e.js.map
