@@ -3,8 +3,8 @@ class Timer {
 	listOfTicks = [];
 	
 	checkTheTickTime() {
-		for (let i = 0; i === this.listOfTicks.length; i++) {
-			if(this.listOfTicks[i].endTime == generalGameTime) {
+		for (var i = 0; i == this.listOfTicks.length; i++) {
+			if(this.listOfTicks[i].endTime == this.generalGameTime) {
 				this.listOfTicks[i].done = true;
 				console.log('The Tick Has Be End: '+this.listOfTicks[i]);
 			}
@@ -32,4 +32,4 @@ function loop() {
 
 setInterval(loop, 1);
 
-generalTimer.listOfTicks.push(new Tick(20,40));
+generalTimer.listOfTicks.push(new Tick(20,6000));
