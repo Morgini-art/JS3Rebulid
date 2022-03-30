@@ -1,21 +1,22 @@
 class Hitbox {
-    constructor(hitboxX, hitboxY, hitboxWidth, hitboxHeight) {
-        this.hitboxX = hitboxX;
-        this.hitboxY = hitboxY;
-        this.hitboxWidth = hitboxWidth;
-        this.hitboxHeight = hitboxHeight;
-    }
-    
-    hitboxCollision(Hitbox) {
-        if (this.hitboxX + this.hitboxWidth < Hitbox.hitboxX ||
-            Hitbox.hitboxX + Hitbox.hitboxWidth < this.hitboxX ||
-            this.hitboxY + this.hitboxHeight < Hitbox.hitboxY ||
-            Hitbox.hitboxY + Hitbox.hitboxHeight < this.hitboxY) {
-            return false;
-        } else {
-            return true
-        }
+    constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 }
 
-export {Hitbox};
+function checkCollisionWith(hitbox1, hitbox2) {
+    if (hitbox1.x < hitbox2.x + hitbox2.width &&
+        hitbox1.x + hitbox1.width > hitbox2.x &&
+        hitbox1.y < hitbox2.y + hitbox2.height &&
+        hitbox1.height + hitbox1.y > hitbox2.y) {
+        console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
+        return true;
+
+    } else {
+        return false;
+    }
+}
+export {Hitbox, checkCollisionWith};

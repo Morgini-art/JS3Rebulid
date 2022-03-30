@@ -1,86 +1,112 @@
-import {playerX, playerY, playerLife} from './player.js';
-import {trialEnemyAttackTime} from './main.js';
-export {Enemy,drawEnemy,enemyWherePlayer,enemyMoveToPlayer,enemyAi};
+import {trialEnemyAttackTime, generalTimer} from './main.js';
+import {Tick} from './lib/time.js';
+export {Enemy};
 
 class Enemy {
-    constructor(enemyX, enemyY, enemyWidth, enemyHeight, enemyHp,enemySpeed, enemyDefendChance, enemyMinDmg, enemyMaxDmg, enemyDrop, enemyDropAmount,enemyWeapon) {
-        this.enemyX = enemyX;
-        this.enemyY = enemyY;
-        this.enemyWidth = enemyWidth;
-        this.enemyHeight = enemyHeight;
-        this.enemyHp = enemyHp;
-        this.enemyObjectiveX
-        this.enemyObjectiveY
-        this.enemySpeed = enemySpeed;
-        this.enemyDefendChance = enemyDefendChance;
-        this.enemyMinDmg = enemyMinDmg;
-        this.enemyMaxDmg = enemyMaxDmg;
-        this.enemyDrop = enemyDrop;
-        this.enemyDropAmount = enemyDropAmount;
+    constructor(x, y, width, height, hp, speed, defendChance, minDmg, maxDmg, drop, dropAmount, weapon) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.hp = hp;
+        this.objectiveX;
+        this.objectiveY;
+        this.speed = speed;
+        this.defendChance = defendChance;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
+        this.drop = drop;
+        this.dropAmount = dropAmount;
         //Niewymagane argumenty
-        this.enemyIsAlive = true;
-        this.enemyAiState = 'quest';
-        this.enemyWalkingDirectionX = 'none';
-        this.enemyWalkingDirectionY = 'none';
-        this.enemyAttackTime;
+        this.isAlive = true;
+        this.aiState = 'quest';
+        this.walkingDirectionX = 'none';
+        this.walkingDirectionY = 'none';
+        this.attackTime;
         //Wszystkich argumentów 17
     }
-}
 
-function drawEnemy(ctx ,enemyX, enemyY) {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(enemyX, enemyY, 50, 65);
-}
-
-function enemyWherePlayer(enemyObject, playerObject) {
+    drawEnemy(ctx) {
+        const {
+            x,
+            y,
+            width,
+            height
+        } = this;
+        ctx.fillStyle = 'red';
+        ctx.fillRect(x, y, width, height);
+    }
     
-    if (playerObject.playerX > enemyObject.enemyX) {
-        enemyObject.enemyWalkingDirectionX = 'Right';
-        enemyObject.enemyObjectiveX = playerObject.playerX;
-    } else {
-        enemyObject.enemyWalkingDirectionX = 'Left';
-        enemyObject.enemyObjectiveX = playerObject.playerX;
-    }
+    wherePlayer(playerObject) {
+        const {
+            x,
+            y
+        } = this;
 
-    if (playerObject.playerY > enemyObject.enemyY) {
-        enemyObject.enemyWalkingDirectionY = 'Down';
-        enemyObject.enemyObjectiveY = playerObject.playerY;
-    } else {
-        enemyObject.enemyWalkingDirectionY = 'Up';
-        enemyObject.enemyObjectiveY = playerObject.playerY;
-    }
-}
+        if (playerObject.x > x) {
+            this.walkingDirectionX = 'Right';
+            this.objectiveX = playerObject.x;
+        } else {
+            this.walkingDirectionX = 'Left';
+            this.objectiveX = playerObject.x;
+        }
 
-function enemyMoveToPlayer(enemyObject, playerObject) {
-    if (enemyObject.enemyWalkingDirectionX === 'Left' && enemyObject.enemyX != playerObject.playerX) {
-        enemyObject.enemyX -= enemyObject.enemySpeed;
-    } else if (enemyObject.enemyWalkingDirectionX === 'Right' && enemyObject.enemyX != playerObject.playerX) {
-        enemyObject.enemyX += enemyObject.enemySpeed;
+        if (playerObject.y > y) {
+            this.walkingDirectionY = 'Down';
+            this.objectiveY = playerObject.y;
+        } else {
+            this.walkingDirectionY = 'Up';
+            this.objectiveY = playerObject.y;
+        }
     }
+    
+    moveToPlayer(playerObject) {
+        const {
+            x,
+            y,
+            walkingDirectionX,
+            walkingDirectionY,
+            speed
+        } = this;
+        
+        if (walkingDirectionX === 'Left' && x != playerObject.x) {
+            this.x -= speed;
+        } else if (walkingDirectionX === 'Right' && x != playerObject.x) {
+            this.x += speed;
+        }
 
-    if (enemyObject.enemyWalkingDirectionY === 'Up' && enemyObject.enemyY != playerObject.playerY) {
-        enemyObject.enemyY -= enemyObject.enemySpeed;
-    } else if (enemyObject.enemyWalkingDirectionY === 'Down' && enemyObject.enemyY != playerObject.playerY) {
-        enemyObject.enemyY += enemyObject.enemySpeed;
+        if (walkingDirectionY === 'Up' && y != playerObject.y) {
+            this.y -= speed;
+        } else if (walkingDirectionY === 'Down' && y != playerObject.y) {
+            this.y += speed;
+        }
     }
-}
-
-function enemyAi(enemyObject, attackList, attackTime1, playerLife, playerObject) {
-    var attackTime = enemyObject.enemyAttackTime;
-    if (enemyObject.enemyIsAlive) {
-        enemyWherePlayer(enemyObject, playerObject);
-        if (enemyObject.enemyAiState === 'quest') {
-            enemyMoveToPlayer(enemyObject, playerObject);
-            attackList.pop();
-        } else if (enemyObject.enemyAiState === 'toattack') {
-            if (attackList[attackList.length - 1] == null) {
-                attackList.push('EnemyLightAttack');
-            }
-            if (attackTime <= 0) {
+    
+    enemyAi(attackList, playerObject, generalTimer) {
+        const {
+            attackTime,
+            isAlive,
+            aiState
+        } = this;
+        
+        if (isAlive) {
+            this.wherePlayer(playerObject);
+            if (aiState === 'quest') {
+                this.moveToPlayer(playerObject);
                 attackList.pop();
-                //console.log('Attack!');
-                playerLife = 2;
-                enemyObject.enemyAttackTime = enemyObject.enemyWeapon.weaponSpeedLightAttack;
+            } else if (aiState === 'toattack') {
+                if (attackList[attackList.length - 1] == null) {
+                    attackList.push('EnemyLightAttack');
+                }
+                /*
+                if (generalTimer.listOfTicks[0].done == true) {
+                    generalTimer.listOfTicks.pop();
+                    attackList.pop();
+                    console.log('Attack!');
+                    //generalTimer.listOfTicks.push('EnemyLightAttack', generalTimer.generalGameTime, enemyObject.enemyWeapon.weaponSpeedLightAttack);
+                    console.log(generalTimer.listOfTicks[0]);
+                }*/
+                console.log(generalTimer.listOfTicks);
             }
         }
     }

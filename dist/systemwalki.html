@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html lang="pl">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=egde,chrome=1">
+    <title>JS3</title>
+    <link rel="stylesheet" href="/index.7ef10829.css">
+</head>
+
+<body>
+<!--    <script src='js/calculate.js'></script>-->
+    <h1>JS3 System Walki</h1>
+
+    <h3>Broń</h3>
+    Nazwa
+    <input type="text" value="Sztylet" id="name"><br>
+    Min-Dmg
+    <input type="text" id="min-dmg" value="6">
+    Max-Dmg
+    <input type="text" id="max-dmg" value="9"><br>
+    Waga
+    <input type="text" id="weight" value="1"><br>
+    Energia - Lekki Atak
+    <input type="text" id="energy-light-attack" value="20"><br>
+    Szybkość - Lekkiego Ataku
+    <input type="text" id="speed-light-attack" value="750">
+
+    <h3>Statystyki bohatera</h3>
+    Siła
+    <input type="text" id="strength" value="2"><br>
+    Zwinność
+    <input type="text" id="agility" value="2"><br>
+    Energia
+    <input type="text" id="energy" value="1"><br>
+
+    <h3>Dodatkowe</h3>
+    <button class="buttonchangearmor" onclick="changeArmor()"><img id="doneicon" class="doneicon  armorno" src="/done-icon.8dfcef0d.png"></button><span id="armortext">Zbroja</span>
+    <br>
+    <input type="text" id="armor" disabled=""><br>
+    
+    <button onclick="calculate()">Oblicz</button>
+    <button onclick="calculate(true)">Develop Mode</button>
+
+    <p id="resultsbox">Wynik Pojawi się tutaj</p>
+    <a href="/index.html">Powrót do gry</a>
+<script src="/systemwalki.44805817.js"></script></body>
+
+</html>

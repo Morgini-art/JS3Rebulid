@@ -142,13 +142,13 @@
       this[globalName] = mainExports;
     }
   }
-})({"2v9qX":[function(require,module,exports) {
+})({"2IlbF":[function(require,module,exports) {
 "use strict";
 var HMR_HOST = null;
 var HMR_PORT = null;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
-module.bundle.HMR_BUNDLE_ID = "a89e3113dc67f97e";
+module.bundle.HMR_BUNDLE_ID = "318b122c193b88d9";
 function _toConsumableArray(arr) {
     return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
@@ -518,336 +518,72 @@ function hmrAcceptRun(bundle, id) {
     acceptedAssets[id] = true;
 }
 
-},{}],"e0TrB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "generalTimer", ()=>generalTimer
-);
-parcelHelpers.export(exports, "trialEnemyAttackTime", ()=>trialEnemyAttackTime
-);
-var _playerJs = require("./player.js");
-var _timeJs = require("./lib/time.js");
-var _enemyJs = require("./enemy.js");
-var _weaponJs = require("./weapon.js");
-var _hitboxJs = require("./hitbox.js");
-const can = document.getElementById('gra');
-const ctx = can.getContext('2d');
-const canWidth = can.width;
-const canHeight = can.height;
-const trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 750), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 8, 10, 'gold', 3);
-let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(250, 250, 50, 65, 5, new _hitboxJs.Hitbox, trialWeapon1, 100);
-const generalTimer = new _timeJs.Timer();
-//Destrukturyzacja obiektów
-//Destrukturyzacja obiektów - end
-console.log(enemy1);
-playerWeapon = trialWeapon2;
-player1.hitbox = new _hitboxJs.Hitbox(player1.x, player1.y, player1.width, player1.height);
-let attackList = [];
-enemy1.weapon = trialWeapon1;
-enemy1.attackTime = enemy1.weapon;
-let trialEnemyAttackTime = enemy1.weapon.weaponSpeedLightAttack;
-can.addEventListener('click', (e)=>{
-    player1.movingPlayer(e.offsetX, e.offsetY);
-});
-function drawAll() {
-    ctx.clearRect(0, 0, canWidth, canHeight);
-    enemy1.drawEnemy(ctx);
-    player1.drawPlayer(ctx);
-    requestAnimationFrame(drawAll);
-}
-function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
-    ctx.fillStyle = fontColor;
-    ctx.font = fontSize + 'px ' + fontFamily;
-    ctx.fillText(textToDisplay, textX, textY);
-}
-function gameLoop() {
-    updateHitboxs();
-    //    if (checkCollisionWith(player1.playerHitbox, enemy1.playerHitbox) && attackList == null) {
-    //        enemy1.enemyAiState = 'toattack';
-    //        generalTimer.listOfTicks.push(new Tick('EnemyLightAttack',generalTimer.generalGameTime,enemy1.enemyWeapon.weaponSpeedLightAttack)); 
-    //        console.log(generalTimer.listOfTicks);
-    //    } else if (player1.playerHitbox.hitboxCollision(enemyHitbox)) {
-    //        enemy1.enemyAiState = 'toattack';
-    //    } else {
-    //        enemy1.enemyAiState = 'quest';
-    //        attackList.pop();
-    //        enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
-    //    }
-    if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) enemy1.aiState = 'stay';
-    else enemy1.aiState = 'quest';
-}
-function updateHitboxs() {
-    player1.hitbox.x = player1.x;
-    player1.hitbox.y = player1.y;
-    enemyHitbox.x = enemy1.x;
-    enemyHitbox.y = enemy1.y;
-}
-function enemyLoop() {
-    enemy1.enemyAi(attackList, player1, generalTimer);
-}
-function playerLoop() {
-    player1.playerMove();
-}
-//function enemyAttackTimer(attackList) {
-//    //console.log(attackList[0]);
-//    if (attackList[attackList.length - 1] === 'EnemyLightAttack') { 
-//        enemy1.enemyAttackTime -= 20;
-//    }
-//}
-setInterval(gameLoop, 10);
-setInterval(enemyLoop, 35);
-setInterval(playerLoop, 30);
-setInterval(_timeJs.timeLoop, 1, generalTimer);
-requestAnimationFrame(drawAll);
-
-},{"./player.js":"3yick","./lib/time.js":"lctuB","./enemy.js":"ey3S5","./weapon.js":"ihCsK","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "playerWeapon", ()=>playerWeapon
-);
-parcelHelpers.export(exports, "Player", ()=>Player
-);
-var _hitboxJs = require("./hitbox.js");
-class Player {
-    constructor(x, y, width, height, movingSpeed, hitbox, weapon, life){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.movingSpeed = movingSpeed;
-        this.hitbox = hitbox;
-        this.weapon = weapon;
-        this.life = life;
-        this.movingDirectionAxisX;
-        this.movingDirectionAxisY;
-        this.targetX;
-        this.targetY;
-        this.isMovingX;
-        this.isMovingY;
+},{}],"7vyAB":[function(require,module,exports) {
+let name;
+let minDmg;
+let maxDmg;
+let weight;
+let energyLightAttack;
+let speedLightAttack;
+let strength, agility, energy;
+let resultsBox;
+let armor = false;
+let armorInput = document.getElementById('armor');
+let armorValue;
+let oldData;
+let newData;
+let outData;
+function calculate(developMode = false) {
+    //    console.log('I calculate...');
+    //Weapon
+    name = document.getElementById('name').value;
+    minDmg = document.getElementById('min-dmg').value;
+    maxDmg = document.getElementById('max-dmg').value;
+    weight = document.getElementById('weight').value;
+    energyLightAttack = document.getElementById('energy-light-attack').value;
+    speedLightAttack = document.getElementById('speed-light-attack').value;
+    armorValue = document.getElementById('armor').value;
+    resultsBox = document.getElementById('resultsbox');
+    //Weapon
+    //Hero
+    //x = document.getElementById('x').value;
+    energy = document.getElementById('energy').value;
+    agility = document.getElementById('agility').value;
+    strength = document.getElementById('strength').value;
+    //Hero  
+    //Algorytmy
+    speedLightAttack = eval(speedLightAttack);
+    energyLightAttack = eval(energyLightAttack);
+    var realminDmg = minDmg - (weight / strength - 1);
+    var realmaxDmg = maxDmg - (weight / strength - 1);
+    if (armor) var realSpeedLightAttack = speedLightAttack + weight * 100 / agility + armorValue * 100 / strength;
+    else var realSpeedLightAttack = speedLightAttack + weight * 100 / agility;
+    var realEnergyLightAttack = energyLightAttack + weight * 2 / energy;
+    outData = `<h3>Wynik:</h3>` + `MinDMG:` + realminDmg + `<br>MaxDMG:` + realmaxDmg + `<br>` + `Szybkość Lekkiego Ataku:` + realSpeedLightAttack + `<br>` + `Energia - Lekki Atak:` + realEnergyLightAttack;
+    //    console.log(speedLightAttack+1);
+    if (developMode) {
+        console.log('Develop Mode it is turned on');
+        var name2 = "'" + name + "'";
+        console.log(name2);
+        outData += '<br>Kod:<br>new Weapon(' + name2 + ',' + minDmg + ',' + maxDmg + ',' + weight + ',' + energyLightAttack + ',' + speedLightAttack + ')';
     }
-    drawPlayer(ctx) {
-        const { x , y , height , width  } = this;
-        ctx.fillStyle = 'green';
-        ctx.fillRect(x, y, width, height);
+    resultsbox.innerHTML = outData;
+}
+function changeArmor() {
+    var doneIcon = document.getElementById('doneicon');
+    armorInput = document.getElementById('armor');
+    if (armor === true) {
+        armor = false;
+        doneIcon.classList.add('armorno');
+        armorInput.setAttribute('disabled', true);
+    } else {
+        armor = true;
+        doneIcon.classList.remove('armorno');
+        armorInput.removeAttribute('disabled');
     }
-    movingPlayer(layerX, layerY) {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY  } = this;
-        this.movingDirectionAxisX = x > layerX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
-        this.targetX = layerX;
-        this.movingDirectionAxisY = y > layerY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        this.targetY = layerY;
-        this.isMovingX = true;
-        this.isMovingY = true;
-    }
-    playerMove() {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY , movingSpeed  } = this;
-        if (isMovingX) {
-            if (movingDirectionAxisX === 'Left') {
-                this.x -= movingSpeed;
-                if (x == targetX || x <= targetX || x <= 0) this.isMovingX = false;
-            } else if (movingDirectionAxisX === 'Right') {
-                this.x += movingSpeed;
-                if (x == targetX || x >= targetX || x >= 780) this.isMovingX = false;
-            }
-        }
-        if (isMovingY) {
-            if (movingDirectionAxisY === 'Up') {
-                this.y -= movingSpeed;
-                if (y === targetY || y <= targetY || y <= 0) this.isMovingY = false;
-            } else if (movingDirectionAxisY === 'Down') {
-                this.y += movingSpeed;
-                if (y === targetY || y >= targetY || y >= 630) this.isMovingY = false;
-            }
-        }
-    }
-    playerAttack() {
-    }
+    console.log(armor);
 }
 
-},{"./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
-);
-parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
-);
-class Hitbox {
-    constructor(x, y, width, height){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-}
-function checkCollisionWith(hitbox1, hitbox2) {
-    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) {
-        console.log('Kolizja pomiędzy ' + hitbox1 + ' a ' + hitbox2);
-        return true;
-    } else return false;
-}
+},{}]},["2IlbF","7vyAB"], "7vyAB", "parcelRequire94c2")
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || dest.hasOwnProperty(key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"lctuB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Timer", ()=>Timer
-);
-parcelHelpers.export(exports, "Tick", ()=>Tick
-);
-parcelHelpers.export(exports, "timeLoop", ()=>timeLoop
-);
-class Timer {
-    generalGameTime = 0;
-    listOfTicks = new Array;
-    checkTheTickTime() {
-        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime == this.generalGameTime) {
-            this.listOfTicks[i].done = true;
-            console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
-        }
-        this.generalGameTime++;
-    }
-}
-class Tick {
-    constructor(nameOfTick, startTime, endTime, done = false){
-        this.nameOfTick = nameOfTick;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.done = done;
-    }
-}
-function timeLoop(timerObject) {
-    timerObject.checkTheTickTime();
-//console.log(timerObject.generalGameTime);
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Enemy", ()=>Enemy
-);
-var _mainJs = require("./main.js");
-var _timeJs = require("./lib/time.js");
-class Enemy {
-    constructor(x, y, width, height, hp, speed, defendChance, minDmg, maxDmg, drop, dropAmount, weapon){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.hp = hp;
-        this.objectiveX;
-        this.objectiveY;
-        this.speed = speed;
-        this.defendChance = defendChance;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
-        this.drop = drop;
-        this.dropAmount = dropAmount;
-        //Niewymagane argumenty
-        this.isAlive = true;
-        this.aiState = 'quest';
-        this.walkingDirectionX = 'none';
-        this.walkingDirectionY = 'none';
-        this.attackTime;
-    //Wszystkich argumentów 17
-    }
-    drawEnemy(ctx) {
-        const { x , y , width , height  } = this;
-        ctx.fillStyle = 'red';
-        ctx.fillRect(x, y, width, height);
-    }
-    wherePlayer(playerObject) {
-        const { x , y  } = this;
-        if (playerObject.x > x) {
-            this.walkingDirectionX = 'Right';
-            this.objectiveX = playerObject.x;
-        } else {
-            this.walkingDirectionX = 'Left';
-            this.objectiveX = playerObject.x;
-        }
-        if (playerObject.y > y) {
-            this.walkingDirectionY = 'Down';
-            this.objectiveY = playerObject.y;
-        } else {
-            this.walkingDirectionY = 'Up';
-            this.objectiveY = playerObject.y;
-        }
-    }
-    moveToPlayer(playerObject) {
-        const { x , y , walkingDirectionX , walkingDirectionY , speed  } = this;
-        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= speed;
-        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += speed;
-        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= speed;
-        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += speed;
-    }
-    enemyAi(attackList, playerObject, generalTimer) {
-        const { attackTime , isAlive , aiState  } = this;
-        if (isAlive) {
-            this.wherePlayer(playerObject);
-            if (aiState === 'quest') {
-                this.moveToPlayer(playerObject);
-                attackList.pop();
-            } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
-                /*
-                if (generalTimer.listOfTicks[0].done == true) {
-                    generalTimer.listOfTicks.pop();
-                    attackList.pop();
-                    console.log('Attack!');
-                    //generalTimer.listOfTicks.push('EnemyLightAttack', generalTimer.generalGameTime, enemyObject.enemyWeapon.weaponSpeedLightAttack);
-                    console.log(generalTimer.listOfTicks[0]);
-                }*/ console.log(generalTimer.listOfTicks);
-            }
-        }
-    }
-}
-
-},{"./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Weapon", ()=>Weapon
-);
-class Weapon {
-    constructor(weaponName, weaponMinDmg, weaponMaxDmg, weaponWeight, weaponEnergyLightAttack, weaponSpeedLightAttack){
-        this.weaponName = weaponName;
-        this.weaponMinDmg = weaponMinDmg;
-        this.weaponMaxDmg = weaponMaxDmg;
-        this.weaponWeight = weaponWeight;
-        this.weaponEnergyLightAttack = weaponEnergyLightAttack;
-        this.weaponSpeedLightAttack = weaponSpeedLightAttack;
-    }
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
-
-//# sourceMappingURL=index.dc67f97e.js.map
+//# sourceMappingURL=enemyai.193b88d9.js.map

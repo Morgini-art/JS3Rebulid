@@ -142,13 +142,13 @@
       this[globalName] = mainExports;
     }
   }
-})({"2v9qX":[function(require,module,exports) {
+})({"ijlLy":[function(require,module,exports) {
 "use strict";
 var HMR_HOST = null;
 var HMR_PORT = null;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
-module.bundle.HMR_BUNDLE_ID = "a89e3113dc67f97e";
+module.bundle.HMR_BUNDLE_ID = "a4f76edba0fb9392";
 function _toConsumableArray(arr) {
     return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
@@ -518,174 +518,174 @@ function hmrAcceptRun(bundle, id) {
     acceptedAssets[id] = true;
 }
 
-},{}],"e0TrB":[function(require,module,exports) {
+},{}],"jwlY8":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "generalTimer", ()=>generalTimer
+parcelHelpers.export(exports, "drawText", ()=>drawText
 );
-parcelHelpers.export(exports, "trialEnemyAttackTime", ()=>trialEnemyAttackTime
+parcelHelpers.export(exports, "setYOfUnits", ()=>setYOfUnits
 );
-var _playerJs = require("./player.js");
-var _timeJs = require("./lib/time.js");
-var _enemyJs = require("./enemy.js");
-var _weaponJs = require("./weapon.js");
-var _hitboxJs = require("./hitbox.js");
-const can = document.getElementById('gra');
+var _clicksystemJs = require("./clicksystem.js");
+var _unitJs = require("./unit.js");
+var _boardJs = require("./board.js");
+var _buttonsJs = require("./buttons.js");
+const can = document.getElementById('canvasScreen');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-const trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 750), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 8, 10, 'gold', 3);
-let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(250, 250, 50, 65, 5, new _hitboxJs.Hitbox, trialWeapon1, 100);
-const generalTimer = new _timeJs.Timer();
-//Destrukturyzacja obiektów
-//Destrukturyzacja obiektów - end
-console.log(enemy1);
-playerWeapon = trialWeapon2;
-player1.hitbox = new _hitboxJs.Hitbox(player1.x, player1.y, player1.width, player1.height);
-let attackList = [];
-enemy1.weapon = trialWeapon1;
-enemy1.attackTime = enemy1.weapon;
-let trialEnemyAttackTime = enemy1.weapon.weaponSpeedLightAttack;
+let arrayOfAxisY = [];
+for(let z = 10; z < 1200;){
+    arrayOfAxisY.push(z);
+    z += 60;
+}
+let bulidingUnits = [];
+const xforAll = 70;
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Gdy żyje', 0, 'Gdy żyje', 'basic'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Gdy Umrę', 3, 'Gdy Umrę', 'basic'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Gdy dostanę obrażenia', 4, 'Gdy dostanę dmg', 'basic'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Idź', 1, 'Idź', 'mobility'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Podążaj za graczem', 2, 'Idź do gracza', 'mobility'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Parowanie Ciosu', 5, 'Parowanie Ciosu', 'fight'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Unik', 5, 'Unik', 'fight'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Atak (Szybki Cios)', 5, 'Atak (Szybki Cios)', 'fight'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Atak (Ciężki Cios)', 5, 'Atak (Ciężki Cios)', 'fight'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Kolizja z graczem', 6, 'Kolizja z graczem', 'events'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'Jeżeli', 6, 'Jeżeli', 'conditions'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, 'mojeHP', 6, 'mojeHP', 'variable'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, '==', 6, '==', 'logical operators'));
+bulidingUnits.push(new _unitJs.Unit(xforAll, undefined, '...', 6, '...', 'free input'));
+bulidingUnits.push(new _unitJs.FreeInputUnit(xforAll, undefined, '...', 6, '...', 'free input'));
+console.log(bulidingUnits[bulidingUnits.length - 1]);
+for(let z1 = 10; z1 < 1200;){
+    z1 += 60;
+    arrayOfAxisY.push(z1);
+}
+let board = new _boardJs.Board();
+let deleteLastUnitButton = new _buttonsJs.Button(1100, 10, 150, 50, 'Usuń ostatni blok', 'deleteLastUnit', '#3458eb');
+let changeGroupButton = new _buttonsJs.Button(20, 10, 20, 20, '', 'changeGroupButton', '#c2c0eb');
+const listOfGroups = [
+    'basic',
+    'mobility',
+    'fight',
+    'conditions',
+    'variable',
+    'logical operators',
+    'free input'
+];
+let groupMeter = 0;
+let arrayOfAxisYMeter = 0;
+function setYOfUnits() {
+    for(let b = 0; b < bulidingUnits.length; b++){
+        if (listOfGroups[groupMeter] === bulidingUnits[b].typeOfUnit) arrayOfAxisYMeter++;
+        else arrayOfAxisYMeter = 0;
+        bulidingUnits[b].y = arrayOfAxisY[arrayOfAxisYMeter];
+    }
+//FOR przez wszystkie elementy tablicy
+/*:   JEŻELI aktualna grupa będzię równa aktualnym 'klocku'
+    //:   :zwiększ licznik Y
+    //:   W PRZECIWNYM RAZIE
+    //:    :ustaw licznik y na 0
+    //:zmień y aktualnego elementu na licznikY[] 
+    */ }
 can.addEventListener('click', (e)=>{
-    player1.movingPlayer(e.offsetX, e.offsetY);
+    deleteLastUnitButton.buttonClick(board, e.offsetX, e.offsetY);
+    if (changeGroupButton.buttonClick(board, e.offsetX, e.offsetY, groupMeter)) {
+        setYOfUnits();
+        groupMeter++;
+        if (groupMeter > 6) {
+            groupMeter = 0;
+            arrayOfAxisYMeter = 0;
+        }
+        console.log(groupMeter);
+    }
+    _clicksystemJs.checkClickedOnAddingUnits(e.offsetX, e.offsetY, bulidingUnits, board, listOfGroups[groupMeter]);
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
-    enemy1.drawEnemy(ctx);
-    player1.drawPlayer(ctx);
+    _boardJs.drawBoard(ctx, board, arrayOfAxisY);
+    for(let i = 0; i < bulidingUnits.length; i++)bulidingUnits[i].drawUnit(ctx, listOfGroups[groupMeter]);
+    deleteLastUnitButton.drawButton(ctx);
+    changeGroupButton.drawButton(ctx);
     requestAnimationFrame(drawAll);
 }
 function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
     ctx.fillStyle = fontColor;
     ctx.font = fontSize + 'px ' + fontFamily;
-    ctx.fillText(textToDisplay, textX, textY);
+    ctx.fillText(textToDisplay, textX, textY, 146);
 }
-function gameLoop() {
-    updateHitboxs();
-    //    if (checkCollisionWith(player1.playerHitbox, enemy1.playerHitbox) && attackList == null) {
-    //        enemy1.enemyAiState = 'toattack';
-    //        generalTimer.listOfTicks.push(new Tick('EnemyLightAttack',generalTimer.generalGameTime,enemy1.enemyWeapon.weaponSpeedLightAttack)); 
-    //        console.log(generalTimer.listOfTicks);
-    //    } else if (player1.playerHitbox.hitboxCollision(enemyHitbox)) {
-    //        enemy1.enemyAiState = 'toattack';
-    //    } else {
-    //        enemy1.enemyAiState = 'quest';
-    //        attackList.pop();
-    //        enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
-    //    }
-    if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) enemy1.aiState = 'stay';
-    else enemy1.aiState = 'quest';
-}
-function updateHitboxs() {
-    player1.hitbox.x = player1.x;
-    player1.hitbox.y = player1.y;
-    enemyHitbox.x = enemy1.x;
-    enemyHitbox.y = enemy1.y;
-}
-function enemyLoop() {
-    enemy1.enemyAi(attackList, player1, generalTimer);
-}
-function playerLoop() {
-    player1.playerMove();
-}
-//function enemyAttackTimer(attackList) {
-//    //console.log(attackList[0]);
-//    if (attackList[attackList.length - 1] === 'EnemyLightAttack') { 
-//        enemy1.enemyAttackTime -= 20;
-//    }
-//}
-setInterval(gameLoop, 10);
-setInterval(enemyLoop, 35);
-setInterval(playerLoop, 30);
-setInterval(_timeJs.timeLoop, 1, generalTimer);
 requestAnimationFrame(drawAll);
 
-},{"./player.js":"3yick","./lib/time.js":"lctuB","./enemy.js":"ey3S5","./weapon.js":"ihCsK","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
+},{"./clicksystem.js":"kbEYd","./unit.js":"7dQou","./board.js":"fGBtm","./buttons.js":"2Oz95","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kbEYd":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "playerWeapon", ()=>playerWeapon
+parcelHelpers.export(exports, "checkClickedOnAddingUnits", ()=>checkClickedOnAddingUnits
 );
-parcelHelpers.export(exports, "Player", ()=>Player
-);
-var _hitboxJs = require("./hitbox.js");
-class Player {
-    constructor(x, y, width, height, movingSpeed, hitbox, weapon, life){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.movingSpeed = movingSpeed;
-        this.hitbox = hitbox;
-        this.weapon = weapon;
-        this.life = life;
-        this.movingDirectionAxisX;
-        this.movingDirectionAxisY;
-        this.targetX;
-        this.targetY;
-        this.isMovingX;
-        this.isMovingY;
-    }
-    drawPlayer(ctx) {
-        const { x , y , height , width  } = this;
-        ctx.fillStyle = 'green';
-        ctx.fillRect(x, y, width, height);
-    }
-    movingPlayer(layerX, layerY) {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY  } = this;
-        this.movingDirectionAxisX = x > layerX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
-        this.targetX = layerX;
-        this.movingDirectionAxisY = y > layerY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        this.targetY = layerY;
-        this.isMovingX = true;
-        this.isMovingY = true;
-    }
-    playerMove() {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY , movingSpeed  } = this;
-        if (isMovingX) {
-            if (movingDirectionAxisX === 'Left') {
-                this.x -= movingSpeed;
-                if (x == targetX || x <= targetX || x <= 0) this.isMovingX = false;
-            } else if (movingDirectionAxisX === 'Right') {
-                this.x += movingSpeed;
-                if (x == targetX || x >= targetX || x >= 780) this.isMovingX = false;
+function checkClickedOnAddingUnits(clickX, clickY, bulidingUnits, board, actualGroup) {
+    console.log(clickX, clickY);
+    for(let i = 0; i < bulidingUnits.length; i++)if (clickX > bulidingUnits[i].x && clickX < bulidingUnits[i].x + 150 && clickY > bulidingUnits[i].y && clickY < bulidingUnits[i].y + 50) {
+        console.log('The Block on the name: ' + bulidingUnits[i].nameOfUnit + ' has be clicked.');
+        if (bulidingUnits[i].typeOfUnit === actualGroup) {
+            if (board.unitsOfWorkSpace[0] == null) switch(bulidingUnits[i].typeOfUnit){
+                case 'basic':
+                    board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                    console.table(board.unitsOfWorkSpace);
+                    break;
+                case 'events':
+                    board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                    console.table(board.unitsOfWorkSpace);
+                    break;
+            }
+            else switch(bulidingUnits[i].typeOfUnit){
+                case 'basic':
+                    break;
+                case 'events':
+                    break;
+                case 'conditions':
+                    if (board.stateCreatingConditions != 'addingCondition1') {
+                        board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                        console.table(board.unitsOfWorkSpace);
+                        board.stateCreatingConditions = 'addingCondition1';
+                    }
+                    break;
+                case 'variable':
+                    if (board.stateCreatingConditions === 'addingCondition1') {
+                        board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                        console.table(board.unitsOfWorkSpace);
+                        board.stateCreatingConditions = 'addingCondition2';
+                        console.log(board.stateCreatingConditions);
+                    }
+                    break;
+                case 'logical operators':
+                    if (board.stateCreatingConditions === 'addingCondition2') {
+                        board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                        console.table(board.unitsOfWorkSpace);
+                        board.stateCreatingConditions = 'addingCondition3';
+                        console.log(board.stateCreatingConditions);
+                    }
+                    break;
+                case 'free input':
+                    if (board.stateCreatingConditions === 'addingCondition3') {
+                        board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                        console.table(board.unitsOfWorkSpace);
+                        board.stateCreatingConditions = 'addingCondition4';
+                        console.log(board.stateCreatingConditions);
+                        console.log(board.unitsOfWorkSpace[board.unitsOfWorkSpace.length - 1]);
+                        board.unitsOfWorkSpace[board.unitsOfWorkSpace.length - 1].freeText = prompt('Podaj Wartość: ');
+                    //                                console.log('---');
+                    //                                console.log(bulidingUnits[i].unitOperation);
+                    //                                console.log('---');
+                    //                                console.log(board.unitsOfWorkSpace[board.unitsOfWorkSpace.length-1].unitOperation);
+                    //                                
+                    //                                console.log('!---!');
+                    }
+                    break;
+                default:
+                    board.unitsOfWorkSpace.push(bulidingUnits[i]);
+                    console.table(board.unitsOfWorkSpace);
+                    break;
             }
         }
-        if (isMovingY) {
-            if (movingDirectionAxisY === 'Up') {
-                this.y -= movingSpeed;
-                if (y === targetY || y <= targetY || y <= 0) this.isMovingY = false;
-            } else if (movingDirectionAxisY === 'Down') {
-                this.y += movingSpeed;
-                if (y === targetY || y >= targetY || y >= 630) this.isMovingY = false;
-            }
-        }
     }
-    playerAttack() {
-    }
-}
-
-},{"./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
-);
-parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
-);
-class Hitbox {
-    constructor(x, y, width, height){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-}
-function checkCollisionWith(hitbox1, hitbox2) {
-    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) {
-        console.log('Kolizja pomiędzy ' + hitbox1 + ' a ' + hitbox2);
-        return true;
-    } else return false;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -718,136 +718,111 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"lctuB":[function(require,module,exports) {
+},{}],"7dQou":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Timer", ()=>Timer
+parcelHelpers.export(exports, "Unit", ()=>Unit
 );
-parcelHelpers.export(exports, "Tick", ()=>Tick
+parcelHelpers.export(exports, "FreeInputUnit", ()=>FreeInputUnit
 );
-parcelHelpers.export(exports, "timeLoop", ()=>timeLoop
-);
-class Timer {
-    generalGameTime = 0;
-    listOfTicks = new Array;
-    checkTheTickTime() {
-        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime == this.generalGameTime) {
-            this.listOfTicks[i].done = true;
-            console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
+var _enemyAImainJs = require("./enemyAImain.js");
+class Unit {
+    constructor(x, y, nameOfUnit, idOfUnit, unitOperation, typeOfUnit){
+        this.x = x;
+        this.y = y;
+        this.nameOfUnit = nameOfUnit;
+        this.idOfUnit = idOfUnit;
+        this.unitOperation = unitOperation;
+        this.typeOfUnit = typeOfUnit;
+    }
+    drawUnit(ctx, actualgroup) {
+        let optionalFontColor;
+        if (this.typeOfUnit === 'basic') ctx.fillStyle = '#c23b2d';
+        else if (this.typeOfUnit === 'mobility') ctx.fillStyle = '#b57526';
+        else if (this.typeOfUnit === 'fight') ctx.fillStyle = '#348ebf';
+        else if (this.typeOfUnit === 'events') ctx.fillStyle = '#ebf52f';
+        else if (this.typeOfUnit === 'conditions') ctx.fillStyle = '#272394';
+        else if (this.typeOfUnit === 'variable') ctx.fillStyle = '#96144c';
+        else if (this.typeOfUnit === 'logical operators') ctx.fillStyle = '#5eeb2f';
+        else if (this.typeOfUnit === 'free input') ctx.fillStyle = '#ced9d1';
+        if (this.typeOfUnit === actualgroup) {
+            ctx.fillRect(this.x, this.y, 150, 50);
+            _enemyAImainJs.drawText(this.x + 4, this.y + 12, this.unitOperation, 'black', 16);
         }
-        this.generalGameTime++;
     }
 }
-class Tick {
-    constructor(nameOfTick, startTime, endTime, done = false){
-        this.nameOfTick = nameOfTick;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.done = done;
-    }
-}
-function timeLoop(timerObject) {
-    timerObject.checkTheTickTime();
-//console.log(timerObject.generalGameTime);
+class FreeInputUnit extends Unit {
+    freeText = '';
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
+},{"./enemyAImain.js":"jwlY8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fGBtm":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Enemy", ()=>Enemy
+parcelHelpers.export(exports, "Board", ()=>Board
 );
-var _mainJs = require("./main.js");
-var _timeJs = require("./lib/time.js");
-class Enemy {
-    constructor(x, y, width, height, hp, speed, defendChance, minDmg, maxDmg, drop, dropAmount, weapon){
+parcelHelpers.export(exports, "drawBoard", ()=>drawBoard
+);
+var _enemyAImainJs = require("./enemyAImain.js");
+class Board {
+    unitsOfWorkSpace = [];
+    stateCreatingConditions = 'none';
+}
+function drawBoard(ctx, board, arrayOfAxisY) {
+    for(let i = 0; i < board.unitsOfWorkSpace.length; i++)if (board.unitsOfWorkSpace != null) {
+        const typeOfUnit = board.unitsOfWorkSpace[i].typeOfUnit;
+        if (typeOfUnit === 'basic') ctx.fillStyle = '#c23b2d';
+        else if (typeOfUnit === 'mobility') ctx.fillStyle = '#b57526';
+        else if (typeOfUnit === 'fight') ctx.fillStyle = '#348ebf';
+        else if (typeOfUnit === 'events') ctx.fillStyle = '#ebf52f';
+        else if (typeOfUnit === 'conditions') ctx.fillStyle = '#272394';
+        else if (typeOfUnit === 'variable') ctx.fillStyle = '#96144c';
+        else if (typeOfUnit === 'logical operators') ctx.fillStyle = '#5eeb2f';
+        else if (typeOfUnit === 'free input') ctx.fillStyle = '#ced9d1';
+        ctx.fillRect(575, arrayOfAxisY[i] - 5, 150, 50);
+        if (board.unitsOfWorkSpace[i].freeText != undefined) _enemyAImainJs.drawText(579, arrayOfAxisY[i] - 5 + 12, board.unitsOfWorkSpace[i].freeText, 'black', 16);
+        else _enemyAImainJs.drawText(579, arrayOfAxisY[i] - 5 + 12, board.unitsOfWorkSpace[i].unitOperation, 'black', 16);
+    }
+}
+
+},{"./enemyAImain.js":"jwlY8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2Oz95":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Button", ()=>Button
+);
+var _enemyAImainJs = require("./enemyAImain.js");
+class Button {
+    constructor(x, y, width, height, text, operation, color){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.hp = hp;
-        this.objectiveX;
-        this.objectiveY;
-        this.speed = speed;
-        this.defendChance = defendChance;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
-        this.drop = drop;
-        this.dropAmount = dropAmount;
-        //Niewymagane argumenty
-        this.isAlive = true;
-        this.aiState = 'quest';
-        this.walkingDirectionX = 'none';
-        this.walkingDirectionY = 'none';
-        this.attackTime;
-    //Wszystkich argumentów 17
+        this.text = text;
+        this.operation = operation;
+        this.color = color;
     }
-    drawEnemy(ctx) {
-        const { x , y , width , height  } = this;
-        ctx.fillStyle = 'red';
-        ctx.fillRect(x, y, width, height);
+    drawButton(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        _enemyAImainJs.drawText(this.x + 2, this.y + this.height / 2, this.text, 'black', 16);
     }
-    wherePlayer(playerObject) {
-        const { x , y  } = this;
-        if (playerObject.x > x) {
-            this.walkingDirectionX = 'Right';
-            this.objectiveX = playerObject.x;
-        } else {
-            this.walkingDirectionX = 'Left';
-            this.objectiveX = playerObject.x;
-        }
-        if (playerObject.y > y) {
-            this.walkingDirectionY = 'Down';
-            this.objectiveY = playerObject.y;
-        } else {
-            this.walkingDirectionY = 'Up';
-            this.objectiveY = playerObject.y;
-        }
-    }
-    moveToPlayer(playerObject) {
-        const { x , y , walkingDirectionX , walkingDirectionY , speed  } = this;
-        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= speed;
-        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += speed;
-        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= speed;
-        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += speed;
-    }
-    enemyAi(attackList, playerObject, generalTimer) {
-        const { attackTime , isAlive , aiState  } = this;
-        if (isAlive) {
-            this.wherePlayer(playerObject);
-            if (aiState === 'quest') {
-                this.moveToPlayer(playerObject);
-                attackList.pop();
-            } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
-                /*
-                if (generalTimer.listOfTicks[0].done == true) {
-                    generalTimer.listOfTicks.pop();
-                    attackList.pop();
-                    console.log('Attack!');
-                    //generalTimer.listOfTicks.push('EnemyLightAttack', generalTimer.generalGameTime, enemyObject.enemyWeapon.weaponSpeedLightAttack);
-                    console.log(generalTimer.listOfTicks[0]);
-                }*/ console.log(generalTimer.listOfTicks);
+    buttonClick(board, clickX, clickY, meter) {
+        if (clickX >= this.x && clickX <= this.x + this.width && clickY >= this.y && clickY <= this.y + this.height) {
+            if (this.operation === 'deleteLastUnit') {
+                board.unitsOfWorkSpace.pop();
+                if (board.stateCreatingConditions != 'none') {
+                    let number = board.stateCreatingConditions.substr(15);
+                    number--;
+                    board.stateCreatingConditions = 'addingCondition' + number;
+                }
+                console.log('The Last Unit has be deleted.');
+            } else if (this.operation === 'changeGroupButton') {
+                console.log(true);
+                return true;
             }
         }
     }
 }
 
-},{"./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Weapon", ()=>Weapon
-);
-class Weapon {
-    constructor(weaponName, weaponMinDmg, weaponMaxDmg, weaponWeight, weaponEnergyLightAttack, weaponSpeedLightAttack){
-        this.weaponName = weaponName;
-        this.weaponMinDmg = weaponMinDmg;
-        this.weaponMaxDmg = weaponMaxDmg;
-        this.weaponWeight = weaponWeight;
-        this.weaponEnergyLightAttack = weaponEnergyLightAttack;
-        this.weaponSpeedLightAttack = weaponSpeedLightAttack;
-    }
-}
+},{"./enemyAImain.js":"jwlY8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ijlLy","jwlY8"], "jwlY8", "parcelRequire94c2")
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
-
-//# sourceMappingURL=index.dc67f97e.js.map
+//# sourceMappingURL=enemyai.a0fb9392.js.map
