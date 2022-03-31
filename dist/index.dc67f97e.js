@@ -523,31 +523,24 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "generalTimer", ()=>generalTimer
 );
-parcelHelpers.export(exports, "trialEnemyAttackTime", ()=>trialEnemyAttackTime
-);
 var _playerJs = require("./player.js");
 var _timeJs = require("./lib/time.js");
-var _enemyJs = require("./enemy.js");
 var _weaponJs = require("./weapon.js");
+var _enemyJs = require("./enemy.js");
 var _hitboxJs = require("./hitbox.js");
 const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-const trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 750), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 8, 10, 'gold', 3);
+let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 420), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
+let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 'gold', 4, trialWeapon1);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(250, 250, 50, 65, 5, new _hitboxJs.Hitbox, trialWeapon1, 100);
+let player1 = new _playerJs.Player(250, 250, 50, 65, 5, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), trialWeapon1, 100);
 const generalTimer = new _timeJs.Timer();
-//Destrukturyzacja obiektów
-//Destrukturyzacja obiektów - end
-console.log(enemy1);
-playerWeapon = trialWeapon2;
-player1.hitbox = new _hitboxJs.Hitbox(player1.x, player1.y, player1.width, player1.height);
+console.log('Enemy: ', enemy1);
+console.log('Player: ', player1);
+playerWeapon = trialWeapon1;
 let attackList = [];
-enemy1.weapon = trialWeapon1;
-enemy1.attackTime = enemy1.weapon;
-let trialEnemyAttackTime = enemy1.weapon.weaponSpeedLightAttack;
 can.addEventListener('click', (e)=>{
     player1.movingPlayer(e.offsetX, e.offsetY);
 });
@@ -564,19 +557,19 @@ function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily =
 }
 function gameLoop() {
     updateHitboxs();
-    //    if (checkCollisionWith(player1.playerHitbox, enemy1.playerHitbox) && attackList == null) {
-    //        enemy1.enemyAiState = 'toattack';
-    //        generalTimer.listOfTicks.push(new Tick('EnemyLightAttack',generalTimer.generalGameTime,enemy1.enemyWeapon.weaponSpeedLightAttack)); 
-    //        console.log(generalTimer.listOfTicks);
-    //    } else if (player1.playerHitbox.hitboxCollision(enemyHitbox)) {
-    //        enemy1.enemyAiState = 'toattack';
-    //    } else {
-    //        enemy1.enemyAiState = 'quest';
-    //        attackList.pop();
-    //        enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
-    //    }
-    if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) enemy1.aiState = 'stay';
-    else enemy1.aiState = 'quest';
+    if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) {
+        if (enemy1.aiState != 'toattack') {
+            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
+            console.log(generalTimer.listOfTicks[0]);
+        }
+        enemy1.aiState = 'toattack';
+    } else {
+        enemy1.aiState = 'quest';
+        if (generalTimer.listOfTicks[0] === 'EnemyLightAttack') {
+            generalTimer.listOfTicks.pop();
+            console.log('The Last Tick has be deleted');
+        }
+    }
 }
 function updateHitboxs() {
     player1.hitbox.x = player1.x;
@@ -590,15 +583,9 @@ function enemyLoop() {
 function playerLoop() {
     player1.playerMove();
 }
-//function enemyAttackTimer(attackList) {
-//    //console.log(attackList[0]);
-//    if (attackList[attackList.length - 1] === 'EnemyLightAttack') { 
-//        enemy1.enemyAttackTime -= 20;
-//    }
-//}
 setInterval(gameLoop, 10);
-setInterval(enemyLoop, 35);
-setInterval(playerLoop, 30);
+setInterval(enemyLoop, 25);
+setInterval(playerLoop, 25);
 setInterval(_timeJs.timeLoop, 1, generalTimer);
 requestAnimationFrame(drawAll);
 
@@ -682,10 +669,9 @@ class Hitbox {
     }
 }
 function checkCollisionWith(hitbox1, hitbox2) {
-    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) {
-        console.log('Kolizja pomiędzy ' + hitbox1 + ' a ' + hitbox2);
-        return true;
-    } else return false;
+    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) //console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
+    return true;
+    else return false;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -731,10 +717,7 @@ class Timer {
     generalGameTime = 0;
     listOfTicks = new Array;
     checkTheTickTime() {
-        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime == this.generalGameTime) {
-            this.listOfTicks[i].done = true;
-            console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
-        }
+        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime == this.generalGameTime) this.listOfTicks[i].done = true;
         this.generalGameTime++;
     }
 }
@@ -758,8 +741,10 @@ parcelHelpers.export(exports, "Enemy", ()=>Enemy
 );
 var _mainJs = require("./main.js");
 var _timeJs = require("./lib/time.js");
+//new Enemy(x:580,y:30,w:50,h:65,hp:35,speed:4,defendChance:1,drop:8,dropamount:10,weapon:trialWeapon1);
+//new Enemy(580,30,50,65,35,4,1,'gold',4,trialWeapon1);
 class Enemy {
-    constructor(x, y, width, height, hp, speed, defendChance, minDmg, maxDmg, drop, dropAmount, weapon){
+    constructor(x, y, width, height, hp, speed, defendChance, drop, dropAmount, weapon){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -769,16 +754,14 @@ class Enemy {
         this.objectiveY;
         this.speed = speed;
         this.defendChance = defendChance;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
         this.drop = drop;
         this.dropAmount = dropAmount;
+        this.weapon = weapon;
         //Niewymagane argumenty
         this.isAlive = true;
         this.aiState = 'quest';
         this.walkingDirectionX = 'none';
         this.walkingDirectionY = 'none';
-        this.attackTime;
     //Wszystkich argumentów 17
     }
     drawEnemy(ctx) {
@@ -810,23 +793,30 @@ class Enemy {
         if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= speed;
         else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += speed;
     }
+    attackThePlayer(playerObject) {
+        const { weapon  } = this;
+        const givenDmg = Math.floor(Math.random() * (weapon.maxDmg - weapon.minDmg + 1) + weapon.minDmg);
+        playerObject.life -= givenDmg;
+    }
     enemyAi(attackList, playerObject, generalTimer) {
-        const { attackTime , isAlive , aiState  } = this;
+        const { isAlive , aiState , weapon  } = this;
         if (isAlive) {
             this.wherePlayer(playerObject);
             if (aiState === 'quest') {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
+                generalTimer.listOfTicks.pop();
+                console.log('The Last Tick has be deleted');
             } else if (aiState === 'toattack') {
                 if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
-                /*
-                if (generalTimer.listOfTicks[0].done == true) {
+                if (generalTimer.listOfTicks[0].done === true) {
                     generalTimer.listOfTicks.pop();
                     attackList.pop();
                     console.log('Attack!');
-                    //generalTimer.listOfTicks.push('EnemyLightAttack', generalTimer.generalGameTime, enemyObject.enemyWeapon.weaponSpeedLightAttack);
-                    console.log(generalTimer.listOfTicks[0]);
-                }*/ console.log(generalTimer.listOfTicks);
+                    this.attackThePlayer(playerObject);
+                    generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                }
+            //console.log(generalTimer.listOfTicks);
             }
         }
     }
@@ -838,13 +828,13 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Weapon", ()=>Weapon
 );
 class Weapon {
-    constructor(weaponName, weaponMinDmg, weaponMaxDmg, weaponWeight, weaponEnergyLightAttack, weaponSpeedLightAttack){
-        this.weaponName = weaponName;
-        this.weaponMinDmg = weaponMinDmg;
-        this.weaponMaxDmg = weaponMaxDmg;
-        this.weaponWeight = weaponWeight;
-        this.weaponEnergyLightAttack = weaponEnergyLightAttack;
-        this.weaponSpeedLightAttack = weaponSpeedLightAttack;
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack){
+        this.name = name;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
+        this.weight = weight;
+        this.energyLightAttack = energyLightAttack;
+        this.speedLightAttack = speedLightAttack;
     }
 }
 

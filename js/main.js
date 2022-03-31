@@ -1,36 +1,26 @@
-import {drawPlayer,movingPlayer, playerWeapon, Player} from './player.js';
+import {Player} from './player.js';
 import {Timer, Tick, timeLoop} from './lib/time.js';
-import {Enemy} from './enemy.js';
 import {Weapon} from './weapon.js';
+import {Enemy} from './enemy.js';
 import {Hitbox, checkCollisionWith} from './hitbox.js';
-export {generalTimer, trialEnemyAttackTime};
+export {generalTimer};
 
 const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-const trialWeapon1 = new Weapon('Sztylet',6,9,1,20,750), trialWeapon2 = new Weapon('Miecz',8,12,5,35,1200);
-let enemy1 = new Enemy(580,30,50,65,35,4,1,8,10,'gold',3);
+let trialWeapon1 = new Weapon('Sztylet',6,9,1,20,420), trialWeapon2 = new Weapon('Miecz',8,12,5,35,1200);
+let enemy1 = new Enemy(580,30,50,65,35,4,1,'gold',4, trialWeapon1);
 let enemyHitbox = new Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new Player(250,250,50,65,5, new Hitbox, trialWeapon1,100);
+let player1 = new Player(250,250,50,65,5, new Hitbox(undefined,undefined,50,65), trialWeapon1,100);
 const generalTimer = new Timer();
 
-//Destrukturyzacja obiektów
+console.log('Enemy: ',enemy1);
+console.log('Player: ',player1);
 
-//Destrukturyzacja obiektów - end
-
-console.log(enemy1);
-
-playerWeapon = trialWeapon2;
-player1.hitbox = new Hitbox(player1.x,player1.y,player1.width,player1.height);
-
-
+playerWeapon = trialWeapon1;
 
 let attackList = [];
-enemy1.weapon = trialWeapon1;
-enemy1.attackTime = enemy1.weapon;
-let trialEnemyAttackTime = enemy1.weapon.weaponSpeedLightAttack;
-
 
 can.addEventListener('click', e => {
     player1.movingPlayer(e.offsetX,e.offsetY);
@@ -52,22 +42,20 @@ function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily =
 
 function gameLoop() {
     updateHitboxs();
-//    if (checkCollisionWith(player1.playerHitbox, enemy1.playerHitbox) && attackList == null) {
-//        enemy1.enemyAiState = 'toattack';
-//        generalTimer.listOfTicks.push(new Tick('EnemyLightAttack',generalTimer.generalGameTime,enemy1.enemyWeapon.weaponSpeedLightAttack)); 
-//        console.log(generalTimer.listOfTicks);
-//    } else if (player1.playerHitbox.hitboxCollision(enemyHitbox)) {
-//        enemy1.enemyAiState = 'toattack';
-//    } else {
-//        enemy1.enemyAiState = 'quest';
-//        attackList.pop();
-//        enemy1.enemyAttackTime = enemy1.enemyWeapon.weaponSpeedLightAttack;
-//    }
     
     if (checkCollisionWith(player1.hitbox, enemyHitbox)) {
-        enemy1.aiState = 'stay';
+        if (enemy1.aiState != 'toattack') {
+            generalTimer.listOfTicks.push(new Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
+            console.log(generalTimer.listOfTicks[0]);
+        }
+        enemy1.aiState = 'toattack';
+        
     } else {
         enemy1.aiState = 'quest';
+        if (generalTimer.listOfTicks[0] === 'EnemyLightAttack') {
+            generalTimer.listOfTicks.pop();
+            console.log('The Last Tick has be deleted');
+        }
     }
 }
 
@@ -89,15 +77,8 @@ function playerLoop()
     player1.playerMove();
 }
 
-//function enemyAttackTimer(attackList) {
-//    //console.log(attackList[0]);
-//    if (attackList[attackList.length - 1] === 'EnemyLightAttack') { 
-//        enemy1.enemyAttackTime -= 20;
-//    }
-//}
-
 setInterval(gameLoop, 10);
-setInterval(enemyLoop, 35);
-setInterval(playerLoop, 30);
+setInterval(enemyLoop, 25);
+setInterval(playerLoop, 25);
 setInterval(timeLoop, 1, generalTimer);
 requestAnimationFrame(drawAll);

@@ -1,11 +1,11 @@
 class Weapon {
-    constructor(weaponName, weaponMinDmg, weaponMaxDmg, weaponWeight, weaponEnergyLightAttack, weaponSpeedLightAttack) {
-        this.weaponName = weaponName;
-        this.weaponMinDmg = weaponMinDmg;
-        this.weaponMaxDmg = weaponMaxDmg;
-        this.weaponWeight = weaponWeight;
-        this.weaponEnergyLightAttack = weaponEnergyLightAttack;
-        this.weaponSpeedLightAttack = weaponSpeedLightAttack;
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack) {
+        this.name = name;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
+        this.weight = weight;
+        this.energyLightAttack = energyLightAttack;
+        this.speedLightAttack = speedLightAttack;
     }
 }
 

@@ -7,7 +7,7 @@ class Timer {
         for (var i = 0; i < this.listOfTicks.length; i++) {
             if (this.listOfTicks[i].endTime == this.generalGameTime) {
                 this.listOfTicks[i].done = true;
-                console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
+                //console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
             }
         }
 

@@ -1,9 +1,12 @@
-import {trialEnemyAttackTime, generalTimer} from './main.js';
+import {generalTimer} from './main.js';
 import {Tick} from './lib/time.js';
 export {Enemy};
 
+//new Enemy(x:580,y:30,w:50,h:65,hp:35,speed:4,defendChance:1,drop:8,dropamount:10,weapon:trialWeapon1);
+
+//new Enemy(580,30,50,65,35,4,1,'gold',4,trialWeapon1);
 class Enemy {
-    constructor(x, y, width, height, hp, speed, defendChance, minDmg, maxDmg, drop, dropAmount, weapon) {
+    constructor(x, y, width, height, hp, speed, defendChance, drop, dropAmount, weapon) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -13,16 +16,14 @@ class Enemy {
         this.objectiveY;
         this.speed = speed;
         this.defendChance = defendChance;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
         this.drop = drop;
         this.dropAmount = dropAmount;
+        this.weapon = weapon;
         //Niewymagane argumenty
         this.isAlive = true;
         this.aiState = 'quest';
         this.walkingDirectionX = 'none';
         this.walkingDirectionY = 'none';
-        this.attackTime;
         //Wszystkich argumentów 17
     }
 
@@ -82,11 +83,20 @@ class Enemy {
         }
     }
     
+    attackThePlayer(playerObject) {
+        const {
+            weapon
+        } = this;
+
+        const givenDmg = Math.floor(Math.random() * (weapon.maxDmg - weapon.minDmg + 1) + weapon.minDmg);
+        playerObject.life -= givenDmg;
+    }
+    
     enemyAi(attackList, playerObject, generalTimer) {
         const {
-            attackTime,
             isAlive,
-            aiState
+            aiState,
+            weapon
         } = this;
         
         if (isAlive) {
@@ -94,19 +104,23 @@ class Enemy {
             if (aiState === 'quest') {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
+                generalTimer.listOfTicks.pop();
+                console.log('The Last Tick has be deleted');
+
             } else if (aiState === 'toattack') {
                 if (attackList[attackList.length - 1] == null) {
                     attackList.push('EnemyLightAttack');
                 }
-                /*
-                if (generalTimer.listOfTicks[0].done == true) {
+                
+                if (generalTimer.listOfTicks[0].done === true) {
                     generalTimer.listOfTicks.pop();
                     attackList.pop();
                     console.log('Attack!');
-                    //generalTimer.listOfTicks.push('EnemyLightAttack', generalTimer.generalGameTime, enemyObject.enemyWeapon.weaponSpeedLightAttack);
-                    console.log(generalTimer.listOfTicks[0]);
-                }*/
-                console.log(generalTimer.listOfTicks);
+                    this.attackThePlayer(playerObject);
+                    
+                    generalTimer.listOfTicks.push(new Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                }
+                //console.log(generalTimer.listOfTicks);
             }
         }
     }
