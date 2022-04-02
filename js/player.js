@@ -1,17 +1,9 @@
-import {
-    Hitbox
-} from './hitbox.js';
+import {Creature} from './lib/creature.js';
+import {Hitbox} from './hitbox.js';
 
-class Player {
-    constructor(x, y, width, height, movingSpeed, hitbox, weapon, life) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.movingSpeed = movingSpeed;
-        this.hitbox = hitbox;
-        this.weapon = weapon;
-        this.life = life;
+class Player extends Creature{
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed) {
+        super(x, y, width, height, hitbox, weapon, hp ,movingSpeed);
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
         this.targetX;
@@ -67,7 +59,7 @@ class Player {
             isMovingY,
             movingSpeed
         } = this;
-
+        
         if (isMovingX) {
             if (movingDirectionAxisX === 'Left') {
                 this.x -= movingSpeed;
@@ -97,7 +89,6 @@ class Player {
         }
     }
 
-
     playerAttack() {
 
     }
@@ -105,6 +96,5 @@ class Player {
 }
 
 export {
-    playerWeapon,
     Player
 };

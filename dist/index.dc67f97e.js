@@ -533,12 +533,13 @@ const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
 let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 420), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 35, 4, 1, 'gold', 4, trialWeapon1);
+let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 4, 1, 'gold', 4);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(250, 250, 50, 65, 5, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), trialWeapon1, 100);
+let player1 = new _playerJs.Player(250, 250, 50, 65, 100, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 5);
 const generalTimer = new _timeJs.Timer();
 console.log('Enemy: ', enemy1);
 console.log('Player: ', player1);
+console.log(player1.movingDirectionAxisX);
 playerWeapon = trialWeapon1;
 let attackList = [];
 can.addEventListener('click', (e)=>{
@@ -589,24 +590,16 @@ setInterval(playerLoop, 25);
 setInterval(_timeJs.timeLoop, 1, generalTimer);
 requestAnimationFrame(drawAll);
 
-},{"./player.js":"3yick","./lib/time.js":"lctuB","./enemy.js":"ey3S5","./weapon.js":"ihCsK","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
+},{"./player.js":"3yick","./lib/time.js":"lctuB","./weapon.js":"ihCsK","./enemy.js":"ey3S5","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "playerWeapon", ()=>playerWeapon
-);
 parcelHelpers.export(exports, "Player", ()=>Player
 );
+var _creatureJs = require("./lib/creature.js");
 var _hitboxJs = require("./hitbox.js");
-class Player {
-    constructor(x, y, width, height, movingSpeed, hitbox, weapon, life){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.movingSpeed = movingSpeed;
-        this.hitbox = hitbox;
-        this.weapon = weapon;
-        this.life = life;
+class Player extends _creatureJs.Creature {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed){
+        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
         this.targetX;
@@ -653,25 +646,23 @@ class Player {
     }
 }
 
-},{"./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
+},{"./lib/creature.js":"6wrLr","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6wrLr":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
+parcelHelpers.export(exports, "Creature", ()=>Creature
 );
-parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
-);
-class Hitbox {
-    constructor(x, y, width, height){
+class Creature {
+    // :x, y, width, height, hp, weapon, hitbox;
+    constructor(x, y, width, height, hp, weapon, hitbox, movingSpeed){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.hitbox = hitbox;
+        this.weapon = weapon;
+        this.hp = hp;
+        this.movingSpeed = movingSpeed;
     }
-}
-function checkCollisionWith(hitbox1, hitbox2) {
-    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) //console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
-    return true;
-    else return false;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -704,7 +695,28 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"lctuB":[function(require,module,exports) {
+},{}],"5AMNB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
+);
+parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
+);
+class Hitbox {
+    constructor(x, y, width, height){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+}
+function checkCollisionWith(hitbox1, hitbox2) {
+    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) //console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
+    return true;
+    else return false;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lctuB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Timer", ()=>Timer
@@ -734,35 +746,42 @@ function timeLoop(timerObject) {
 //console.log(timerObject.generalGameTime);
 }
 
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Weapon", ()=>Weapon
+);
+class Weapon {
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack){
+        this.name = name;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
+        this.weight = weight;
+        this.energyLightAttack = energyLightAttack;
+        this.speedLightAttack = speedLightAttack;
+    }
+}
+
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Enemy", ()=>Enemy
 );
+var _creatureJs = require("./lib/creature.js");
 var _mainJs = require("./main.js");
 var _timeJs = require("./lib/time.js");
-//new Enemy(x:580,y:30,w:50,h:65,hp:35,speed:4,defendChance:1,drop:8,dropamount:10,weapon:trialWeapon1);
-//new Enemy(580,30,50,65,35,4,1,'gold',4,trialWeapon1);
-class Enemy {
-    constructor(x, y, width, height, hp, speed, defendChance, drop, dropAmount, weapon){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.hp = hp;
+class Enemy extends _creatureJs.Creature {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, defendChance, drop, dropAmount){
+        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
         this.objectiveX;
         this.objectiveY;
-        this.speed = speed;
         this.defendChance = defendChance;
         this.drop = drop;
         this.dropAmount = dropAmount;
-        this.weapon = weapon;
-        //Niewymagane argumenty
         this.isAlive = true;
         this.aiState = 'quest';
         this.walkingDirectionX = 'none';
         this.walkingDirectionY = 'none';
-    //Wszystkich argumentów 17
     }
     drawEnemy(ctx) {
         const { x , y , width , height  } = this;
@@ -787,11 +806,11 @@ class Enemy {
         }
     }
     moveToPlayer(playerObject) {
-        const { x , y , walkingDirectionX , walkingDirectionY , speed  } = this;
-        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= speed;
-        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += speed;
-        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= speed;
-        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += speed;
+        const { x , y , walkingDirectionX , walkingDirectionY , movingSpeed  } = this;
+        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= movingSpeed;
+        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += movingSpeed;
+        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= movingSpeed;
+        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += movingSpeed;
     }
     attackThePlayer(playerObject) {
         const { weapon  } = this;
@@ -806,7 +825,7 @@ class Enemy {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
                 generalTimer.listOfTicks.pop();
-                console.log('The Last Tick has be deleted');
+            //console.log('The Last Tick has be deleted');
             } else if (aiState === 'toattack') {
                 if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
                 if (generalTimer.listOfTicks[0].done === true) {
@@ -822,22 +841,6 @@ class Enemy {
     }
 }
 
-},{"./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Weapon", ()=>Weapon
-);
-class Weapon {
-    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack){
-        this.name = name;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
-        this.weight = weight;
-        this.energyLightAttack = energyLightAttack;
-        this.speedLightAttack = speedLightAttack;
-    }
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
+},{"./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./lib/creature.js":"6wrLr"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
 
 //# sourceMappingURL=index.dc67f97e.js.map

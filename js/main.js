@@ -9,14 +9,17 @@ const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let trialWeapon1 = new Weapon('Sztylet',6,9,1,20,420), trialWeapon2 = new Weapon('Miecz',8,12,5,35,1200);
-let enemy1 = new Enemy(580,30,50,65,35,4,1,'gold',4, trialWeapon1);
+let trialWeapon1 = new Weapon('Sztylet', 6, 9, 1, 20, 420),
+    trialWeapon2 = new Weapon('Miecz', 8, 12, 5, 35, 1200);
+let enemy1 = new Enemy(580, 30, 50, 65, 40, trialWeapon1, new Hitbox(undefined, undefined, 50, 65), 4, 1, 'gold', 4);
 let enemyHitbox = new Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new Player(250,250,50,65,5, new Hitbox(undefined,undefined,50,65), trialWeapon1,100);
+let player1 = new Player(250, 250, 50, 65, 100, trialWeapon1, new Hitbox(undefined, undefined, 50, 65), 5, 5);
 const generalTimer = new Timer();
 
 console.log('Enemy: ',enemy1);
 console.log('Player: ',player1);
+
+console.log(player1.movingDirectionAxisX);
 
 playerWeapon = trialWeapon1;
 
