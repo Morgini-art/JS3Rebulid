@@ -1,6 +1,7 @@
 import {Creature} from './lib/creature.js';
 import {generalTimer} from './main.js';
 import {Tick} from './lib/time.js';
+import {drawText} from './main.js';
 export {Enemy};
 
 class Enemy extends Creature{
@@ -19,15 +20,17 @@ class Enemy extends Creature{
         this.walkingDirectionY = 'none';
     }
 
-    drawEnemy(ctx) {
+    drawEnemy(ctx, color) {
         const {
             x,
             y,
             width,
             height
         } = this;
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = color;
         ctx.fillRect(x, y, width, height);
+        
+        drawText(x+5,y-5,'Hp:'+this.hp, 'black',17);
     }
     
     wherePlayer(playerObject) {
@@ -75,44 +78,52 @@ class Enemy extends Creature{
         }
     }
     
-    attackThePlayer(playerObject) {
-        const {
-            weapon
-        } = this;
-
-        const givenDmg = Math.floor(Math.random() * (weapon.maxDmg - weapon.minDmg + 1) + weapon.minDmg);
-        playerObject.life -= givenDmg;
-    }
-    
     enemyAi(attackList, playerObject, generalTimer) {
         const {
             isAlive,
             aiState,
             weapon
         } = this;
-        
+
+        const {
+            listOfTicks
+        } = generalTimer;
+
         if (isAlive) {
             this.wherePlayer(playerObject);
             if (aiState === 'quest') {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
-                generalTimer.listOfTicks.pop();
+                //generalTimer.listOfTicks.pop();
                 //console.log('The Last Tick has be deleted');
 
             } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] == null) {
+                if (attackList[attackList.length - 1] !== 'EnemyLightAttack') {
                     attackList.push('EnemyLightAttack');
                 }
-                
-                if (generalTimer.listOfTicks[0].done === true) {
-                    generalTimer.listOfTicks.pop();
-                    attackList.pop();
-                    console.log('Attack!');
-                    this.attackThePlayer(playerObject);
-                    
-                    generalTimer.listOfTicks.push(new Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                var attackIs = false;
+
+                //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
+                while (!attackIs) {
+                    for (let i = 0; i < listOfTicks.length; i++) {
+                        if (listOfTicks[i].nameOfTick === 'EnemyLightAttack') {
+                            if (listOfTicks[i].done && !listOfTicks[i].old) {//Jeśli skończony i nie stary:
+                                attackList.pop();
+                                console.log('Attack!');
+                                this.weapon.attack(this, playerObject, generalTimer);   
+
+                                generalTimer.listOfTicks.push(new Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+
+                                //console.log(generalTimer.listOfTicks);
+                                listOfTicks[i].old = true;
+                                
+                                attackIs = true;
+                                i += listOfTicks.length + 1;
+                            }
+                            attackIs = true;
+                        }
+                    }
                 }
-                //console.log(generalTimer.listOfTicks);
             }
         }
     }

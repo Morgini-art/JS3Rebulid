@@ -523,33 +523,49 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "generalTimer", ()=>generalTimer
 );
-var _playerJs = require("./player.js");
+parcelHelpers.export(exports, "drawText", ()=>drawText
+);
+var _hitboxJs = require("./hitbox.js");
 var _timeJs = require("./lib/time.js");
+var _playerJs = require("./player.js");
 var _weaponJs = require("./weapon.js");
 var _enemyJs = require("./enemy.js");
-var _hitboxJs = require("./hitbox.js");
+var _bulletJs = require("./bullet.js");
+var _textJs = require("./text.js"); //TODO: Chwilowa nazwa pliku!!!
 const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 420), trialWeapon2 = new _weaponJs.Weapon('Miecz', 8, 12, 5, 35, 1200);
-let enemy1 = new _enemyJs.Enemy(580, 30, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 4, 1, 'gold', 4);
+let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 400, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza', 8, 12, 5, 35, 16, 'distance');
+let enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(250, 250, 50, 65, 100, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 5);
+let player1 = new _playerJs.Player(880, 80, 50, 65, 100, trialWeapon2, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 3);
 const generalTimer = new _timeJs.Timer();
+let bullets = [];
+let enemyColor = 'red';
 console.log('Enemy: ', enemy1);
 console.log('Player: ', player1);
+console.log('Weapons: ', trialWeapon1, trialWeapon2);
 console.log(player1.movingDirectionAxisX);
-playerWeapon = trialWeapon1;
 let attackList = [];
 can.addEventListener('click', (e)=>{
-    player1.movingPlayer(e.offsetX, e.offsetY);
+    const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
+    player1.movingPlayer(e.offsetX, e.offsetY, e);
+    player1.playerAttack(e, collisionWith, enemy1, generalTimer);
+});
+document.addEventListener('keyup', (e)=>{
+    const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
+    if (player1.weapon.type === 'melee') player1.playerAttack(e, collisionWith, enemy1, generalTimer);
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
-    enemy1.drawEnemy(ctx);
+    enemy1.drawEnemy(ctx, enemyColor);
     player1.drawPlayer(ctx);
+    for (const bullet of bullets)bullet.drawBullet(ctx);
     requestAnimationFrame(drawAll);
+    drawText(15, 20, 'Hp:' + player1.hp, 'black', 23);
+    drawText(15, 40, 'Your weapon:' + player1.weapon.name);
+    drawText(15, 60, 'Type:' + player1.weapon.type);
 }
 function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
     ctx.fillStyle = fontColor;
@@ -557,22 +573,35 @@ function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily =
     ctx.fillText(textToDisplay, textX, textY);
 }
 function gameLoop() {
+    const { listOfTicks  } = generalTimer;
     updateHitboxs();
     if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) {
         if (enemy1.aiState != 'toattack') {
             generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
-            console.log(generalTimer.listOfTicks[0]);
+            console.log(generalTimer.listOfTicks);
         }
         enemy1.aiState = 'toattack';
     } else {
         enemy1.aiState = 'quest';
-        if (generalTimer.listOfTicks[0] === 'EnemyLightAttack') {
-            generalTimer.listOfTicks.pop();
-            console.log('The Last Tick has be deleted');
+        for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack' && !listOfTicks[i].done) {
+            //console.log('The Tick Of Attack Enemy Has Be Taged: "old".');
+            listOfTicks[i].old = true;
+            i += listOfTicks.length + 1;
         }
+    }
+    for (const bullet of bullets)if (bullet.hitbox != null) {
+        if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemyHitbox)) {
+            enemyColor = 'blue';
+            enemy1.hp -= bullet.minDmg;
+            bullets.splice(bullet, 1);
+        } else enemyColor = 'red';
     }
 }
 function updateHitboxs() {
+    for (const bullet of bullets){
+        bullet.hitbox.x = bullet.x;
+        bullet.hitbox.y = bullet.y;
+    }
     player1.hitbox.x = player1.x;
     player1.hitbox.y = player1.y;
     enemyHitbox.x = enemy1.x;
@@ -580,89 +609,64 @@ function updateHitboxs() {
 }
 function enemyLoop() {
     enemy1.enemyAi(attackList, player1, generalTimer);
+    for (const bullet of bullets){
+        bullet.move();
+        if (bullet.speed === 0 || bullet.distance === 0) {
+            bullets.splice(bullet, 1);
+            console.log(bullets);
+        }
+    }
 }
 function playerLoop() {
     player1.playerMove();
 }
-setInterval(gameLoop, 10);
+function bulletsLoop() {
+    const listOfTicks = generalTimer.listOfTicks;
+    for (const tick of listOfTicks)if (tick.nameOfTick.substr(0, 17) === 'Creating a Bullet' && tick.done && !tick.old) {
+        let rawData = _textJs.interpeter(tick.nameOfTick);
+        rawData[0] = parseInt(rawData[0].substring(2)); //x
+        rawData[1] = parseInt(rawData[1].substring(2)); //y
+        rawData[2] = parseInt(rawData[2].substring(6)); //width
+        rawData[3] = parseInt(rawData[3].substring(7)); //height
+        rawData[4] = parseInt(rawData[4].substring(6)); //speed
+        rawData[5] = parseInt(rawData[5].substring(7)); //mindmg   
+        rawData[6] = parseInt(rawData[6].substring(7)); //maxdmg
+        rawData[7] = parseInt(rawData[7].substring(8)); //targetX
+        rawData[8] = parseInt(rawData[8].substring(8)); //targetY
+        console.log(rawData);
+        bullets.push(new _bulletJs.Bullet(rawData[0], rawData[1], rawData[2], rawData[3], new _hitboxJs.Hitbox(rawData[0], rawData[1], rawData[2], rawData[3]), rawData[4], rawData[5], rawData[6], rawData[7], rawData[8], 560));
+        tick.old = true;
+        for (const bullet of bullets)bullet.checkTheDirection(player1);
+        console.log(bullets[tick]);
+        break;
+    }
+}
+setInterval(gameLoop, 12);
 setInterval(enemyLoop, 25);
 setInterval(playerLoop, 25);
 setInterval(_timeJs.timeLoop, 1, generalTimer);
+setInterval(bulletsLoop, 20);
 requestAnimationFrame(drawAll);
 
-},{"./player.js":"3yick","./lib/time.js":"lctuB","./weapon.js":"ihCsK","./enemy.js":"ey3S5","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
+},{"./hitbox.js":"5AMNB","./lib/time.js":"lctuB","./player.js":"3yick","./weapon.js":"ihCsK","./enemy.js":"ey3S5","./bullet.js":"ZOjFr","./text.js":"1SSyA","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Player", ()=>Player
+parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
 );
-var _creatureJs = require("./lib/creature.js");
-var _hitboxJs = require("./hitbox.js");
-class Player extends _creatureJs.Creature {
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed){
-        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
-        this.movingDirectionAxisX;
-        this.movingDirectionAxisY;
-        this.targetX;
-        this.targetY;
-        this.isMovingX;
-        this.isMovingY;
-    }
-    drawPlayer(ctx) {
-        const { x , y , height , width  } = this;
-        ctx.fillStyle = 'green';
-        ctx.fillRect(x, y, width, height);
-    }
-    movingPlayer(layerX, layerY) {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY  } = this;
-        this.movingDirectionAxisX = x > layerX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
-        this.targetX = layerX;
-        this.movingDirectionAxisY = y > layerY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        this.targetY = layerY;
-        this.isMovingX = true;
-        this.isMovingY = true;
-    }
-    playerMove() {
-        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY , movingSpeed  } = this;
-        if (isMovingX) {
-            if (movingDirectionAxisX === 'Left') {
-                this.x -= movingSpeed;
-                if (x == targetX || x <= targetX || x <= 0) this.isMovingX = false;
-            } else if (movingDirectionAxisX === 'Right') {
-                this.x += movingSpeed;
-                if (x == targetX || x >= targetX || x >= 780) this.isMovingX = false;
-            }
-        }
-        if (isMovingY) {
-            if (movingDirectionAxisY === 'Up') {
-                this.y -= movingSpeed;
-                if (y === targetY || y <= targetY || y <= 0) this.isMovingY = false;
-            } else if (movingDirectionAxisY === 'Down') {
-                this.y += movingSpeed;
-                if (y === targetY || y >= targetY || y >= 630) this.isMovingY = false;
-            }
-        }
-    }
-    playerAttack() {
-    }
-}
-
-},{"./lib/creature.js":"6wrLr","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6wrLr":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Creature", ()=>Creature
+parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
 );
-class Creature {
-    // :x, y, width, height, hp, weapon, hitbox;
-    constructor(x, y, width, height, hp, weapon, hitbox, movingSpeed){
+class Hitbox {
+    constructor(x, y, width, height){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.hitbox = hitbox;
-        this.weapon = weapon;
-        this.hp = hp;
-        this.movingSpeed = movingSpeed;
     }
+}
+function checkCollisionWith(hitbox1, hitbox2) {
+    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) //console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
+    return true;
+    else return false;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -695,28 +699,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"5AMNB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
-);
-parcelHelpers.export(exports, "checkCollisionWith", ()=>checkCollisionWith
-);
-class Hitbox {
-    constructor(x, y, width, height){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-}
-function checkCollisionWith(hitbox1, hitbox2) {
-    if (hitbox1.x < hitbox2.x + hitbox2.width && hitbox1.x + hitbox1.width > hitbox2.x && hitbox1.y < hitbox2.y + hitbox2.height && hitbox1.height + hitbox1.y > hitbox2.y) //console.log('Kolizja pomiędzy '+hitbox1+' a '+hitbox2);
-    return true;
-    else return false;
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lctuB":[function(require,module,exports) {
+},{}],"lctuB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Timer", ()=>Timer
@@ -729,16 +712,21 @@ class Timer {
     generalGameTime = 0;
     listOfTicks = new Array;
     checkTheTickTime() {
-        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime == this.generalGameTime) this.listOfTicks[i].done = true;
+        for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime === this.generalGameTime) {
+            this.listOfTicks[i].done = true;
+            console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
+        //this.listOfTicks[i].pop();
+        }
         this.generalGameTime++;
     }
 }
 class Tick {
-    constructor(nameOfTick, startTime, endTime, done = false){
+    constructor(nameOfTick, startTime, endTime, done = false, old = false){
         this.nameOfTick = nameOfTick;
         this.startTime = startTime;
         this.endTime = endTime;
         this.done = done;
+        this.old = old;
     }
 }
 function timeLoop(timerObject) {
@@ -746,23 +734,127 @@ function timeLoop(timerObject) {
 //console.log(timerObject.generalGameTime);
 }
 
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Player", ()=>Player
+);
+var _creatureJs = require("./lib/creature.js");
+var _hitboxJs = require("./hitbox.js");
+class Player extends _creatureJs.Creature {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed){
+        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
+        this.movingDirectionAxisX;
+        this.movingDirectionAxisY;
+        this.targetX;
+        this.targetY;
+        this.isMovingX;
+        this.isMovingY;
+    }
+    drawPlayer(ctx) {
+        const { x , y , height , width  } = this;
+        ctx.fillStyle = 'green';
+        ctx.fillRect(x, y, width, height);
+    }
+    movingPlayer(layerX, layerY, e) {
+        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY  } = this;
+        if (!e.ctrlKey) {
+            this.movingDirectionAxisX = x > layerX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
+            this.targetX = layerX;
+            this.movingDirectionAxisY = y > layerY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
+            this.targetY = layerY;
+            this.isMovingX = true;
+            this.isMovingY = true;
+        }
+    }
+    playerMove() {
+        const { x , y , targetX , targetY , movingDirectionAxisX , movingDirectionAxisY , isMovingX , isMovingY , movingSpeed  } = this;
+        if (isMovingX) {
+            if (movingDirectionAxisX === 'Left') {
+                this.x -= movingSpeed;
+                if (x == targetX || x <= targetX || x <= 0) this.isMovingX = false;
+            } else if (movingDirectionAxisX === 'Right') {
+                this.x += movingSpeed;
+                if (x == targetX || x >= targetX || x >= 1150) this.isMovingX = false;
+            }
+        }
+        if (isMovingY) {
+            if (movingDirectionAxisY === 'Up') {
+                this.y -= movingSpeed;
+                if (y === targetY || y <= targetY || y <= 0) this.isMovingY = false;
+            } else if (movingDirectionAxisY === 'Down') {
+                this.y += movingSpeed;
+                if (y === targetY || y >= targetY || y >= 730) this.isMovingY = false;
+            }
+        }
+    }
+    playerAttack(e, collision, objective, generalTimer) {
+        const { weapon  } = this;
+        //console.log('Key Code: '+e.keyCode);
+        console.log('CTRL:', e.ctrlKey, collision);
+        console.log('Key Code: ' + e.key, 'Type: ' + weapon.type);
+        if (e.key === 'q' && collision && weapon.type === 'melee') {
+            weapon.attack(this, objective, generalTimer);
+            console.log(generalTimer.listOfTicks);
+        } else if (!collision && weapon.type === 'distance' && e.ctrlKey) weapon.attack(this, objective, generalTimer, e);
+        console.log(collision);
+    }
+}
+
+},{"./lib/creature.js":"6wrLr","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6wrLr":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Creature", ()=>Creature
+);
+class Creature {
+    // :x, y, width, height, hp, weapon, hitbox;
+    constructor(x, y, width, height, hp, weapon, hitbox, movingSpeed){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.hitbox = hitbox;
+        this.weapon = weapon;
+        this.hp = hp;
+        this.movingSpeed = movingSpeed;
+    }
+}
+
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ihCsK":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Weapon", ()=>Weapon
 );
+var _timeJs = require("./lib/time.js");
 class Weapon {
-    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack){
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack, type){
         this.name = name;
         this.minDmg = minDmg;
         this.maxDmg = maxDmg;
         this.weight = weight;
         this.energyLightAttack = energyLightAttack;
         this.speedLightAttack = speedLightAttack;
+        this.type = type;
+    }
+    attack(wieldingWeapons, objective, generalTimer, e) {
+        const { type , minDmg , maxDmg  } = this;
+        const { x , y  } = wieldingWeapons;
+        if (type === 'melee') {
+            const givenDmg = Math.floor(Math.random() * (this.maxDmg - this.minDmg + 1) + this.minDmg);
+            objective.hp -= givenDmg;
+        //console.log('A melle attack');
+        } else if (type === 'distance') {
+            console.log('Create a Bullet!');
+            console.log('DMG:' + minDmg, maxDmg);
+            //x, y, width, height, hitbox, speed, minDmg, maxDmg
+            generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+            console.log(generalTimer);
+            console.log(e.offsetX);
+        }
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
+},{"./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Enemy", ()=>Enemy
@@ -783,10 +875,11 @@ class Enemy extends _creatureJs.Creature {
         this.walkingDirectionX = 'none';
         this.walkingDirectionY = 'none';
     }
-    drawEnemy(ctx) {
+    drawEnemy(ctx, color) {
         const { x , y , width , height  } = this;
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = color;
         ctx.fillRect(x, y, width, height);
+        _mainJs.drawText(x + 5, y - 5, 'Hp:' + this.hp, 'black', 17);
     }
     wherePlayer(playerObject) {
         const { x , y  } = this;
@@ -812,35 +905,131 @@ class Enemy extends _creatureJs.Creature {
         if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= movingSpeed;
         else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += movingSpeed;
     }
-    attackThePlayer(playerObject) {
-        const { weapon  } = this;
-        const givenDmg = Math.floor(Math.random() * (weapon.maxDmg - weapon.minDmg + 1) + weapon.minDmg);
-        playerObject.life -= givenDmg;
-    }
     enemyAi(attackList, playerObject, generalTimer) {
         const { isAlive , aiState , weapon  } = this;
+        const { listOfTicks  } = generalTimer;
         if (isAlive) {
             this.wherePlayer(playerObject);
             if (aiState === 'quest') {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
-                generalTimer.listOfTicks.pop();
+            //generalTimer.listOfTicks.pop();
             //console.log('The Last Tick has be deleted');
             } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] == null) attackList.push('EnemyLightAttack');
-                if (generalTimer.listOfTicks[0].done === true) {
-                    generalTimer.listOfTicks.pop();
-                    attackList.pop();
-                    console.log('Attack!');
-                    this.attackThePlayer(playerObject);
-                    generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                if (attackList[attackList.length - 1] !== 'EnemyLightAttack') attackList.push('EnemyLightAttack');
+                var attackIs = false;
+                //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
+                while(!attackIs){
+                    for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack') {
+                        if (listOfTicks[i].done && !listOfTicks[i].old) {
+                            attackList.pop();
+                            console.log('Attack!');
+                            this.weapon.attack(this, playerObject, generalTimer);
+                            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                            //console.log(generalTimer.listOfTicks);
+                            listOfTicks[i].old = true;
+                            attackIs = true;
+                            i += listOfTicks.length + 1;
+                        }
+                        attackIs = true;
+                    }
                 }
-            //console.log(generalTimer.listOfTicks);
             }
         }
     }
 }
 
-},{"./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./lib/creature.js":"6wrLr"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
+},{"./lib/creature.js":"6wrLr","./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ZOjFr":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Bullet", ()=>Bullet
+);
+class Bullet {
+    constructor(x, y, width, height, hitbox, speed, minDmg, maxDmg, targetX, targetY, distance){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.hitbox = hitbox;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
+        this.speed = speed;
+        this.movingDirectionAxisX;
+        this.movingDirectionAxisY;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.distance = distance;
+    }
+    drawBullet(ctx) {
+        const { x , y , width , height  } = this;
+        ctx.fillStyle = '#b3a276';
+        ctx.fillRect(x, y, width, height);
+    }
+    checkTheDirection(wieldingWeapon) {
+        const { targetX , targetY  } = this;
+        const { x , y  } = wieldingWeapon;
+        this.movingDirectionAxisX = x > targetX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
+        this.movingDirectionAxisY = y > targetY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
+        console.log(this.movingDirectionAxisY);
+    }
+    move() {
+        const { x , y , movingDirectionAxisX , movingDirectionAxisY , speed , targetX , targetY  } = this;
+        this.x = parseInt(this.x);
+        this.y = parseInt(this.y);
+        this.speed = parseInt(this.speed);
+        if (movingDirectionAxisX === 'Left') {
+            this.x -= this.speed;
+            this.distance -= this.speed;
+        } else if (movingDirectionAxisX === 'Right') {
+            this.x += this.speed;
+            this.distance -= this.speed;
+        }
+        if (movingDirectionAxisY === 'Up') {
+            this.y -= this.speed;
+            this.distance -= this.speed;
+        } else if (movingDirectionAxisY === 'Down') {
+            this.y += this.speed;
+            this.distance -= this.speed;
+        }
+        // 250 - 2 
+        //428 - 3 > 432 && 428 - 3 < 
+        if (y === targetY || y - 3 >= targetY && y + 3 >= targetY && movingDirectionAxisY !== 'Up') this.movingDirectionAxisY = 'None';
+        if (this.distance <= 0) this.speed = 0;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1SSyA":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "interpeter", ()=>interpeter
+) /*let test01 = 'CreateBullet{speed:5,distance:50,dmg:12}';
+test01 = interpeter(test01);
+
+
+
+console.log(test01);
+
+if (test01[1] >= 'distance:'+50) {
+    console.log('Daleko');
+} else {
+    console.log('Niedaleko');
+}*/ ;
+//TODO: Chwilowa nazwa pliku!!!
+function interpeter(text) {
+    let startArguments;
+    let endArguments;
+    let results;
+    let commas = [];
+    let arguments = [];
+    for(let i = 0; i < text.length; i++){
+        if (text[i] === '{') startArguments = i;
+        else if (text[i] === '}') endArguments = i;
+        results = text.substring(startArguments + 1, endArguments);
+    }
+    arguments = results.split(',');
+    return arguments;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")
 
 //# sourceMappingURL=index.dc67f97e.js.map

@@ -23,7 +23,7 @@ class Player extends Creature{
         ctx.fillRect(x, y, width, height);
     }
 
-    movingPlayer(layerX, layerY) {
+    movingPlayer(layerX, layerY, e) {
         const {
             x,
             y,
@@ -35,15 +35,16 @@ class Player extends Creature{
             isMovingY
         } = this;
 
-        this.movingDirectionAxisX = (x > layerX) ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
-        this.targetX = layerX;
+        if (!e.ctrlKey) {
+            this.movingDirectionAxisX = (x > layerX) ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
+            this.targetX = layerX;
 
-        this.movingDirectionAxisY = (y > layerY) ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        this.targetY = layerY;
+            this.movingDirectionAxisY = (y > layerY) ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
+            this.targetY = layerY;
 
-        this.isMovingX = true;
-        this.isMovingY = true;
-
+            this.isMovingX = true;
+            this.isMovingY = true;
+        }
     }
 
     playerMove() {
@@ -68,7 +69,7 @@ class Player extends Creature{
                 }
             } else if (movingDirectionAxisX === 'Right') {
                 this.x += movingSpeed;
-                if (x == targetX || x >= targetX || x >= 780) {
+                if (x == targetX || x >= targetX || x >= 1150) {
                     this.isMovingX = false;
                 }
             }
@@ -82,15 +83,26 @@ class Player extends Creature{
                 }
             } else if (movingDirectionAxisY === 'Down') {
                 this.y += movingSpeed;
-                if (y === targetY || y >= targetY || y >= 630) {
+                if (y === targetY || y >= targetY || y >= 730) {
                     this.isMovingY = false;
                 }
             }
         }
     }
 
-    playerAttack() {
-
+    playerAttack(e, collision, objective, generalTimer) {
+        const {weapon} = this;
+        //console.log('Key Code: '+e.keyCode);
+        console.log('CTRL:',e.ctrlKey, collision);
+        console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
+        
+        if (e.key === 'q' && collision && weapon.type === 'melee') {
+            weapon.attack(this, objective, generalTimer);
+            console.log(generalTimer.listOfTicks);
+        } else if (!collision && weapon.type === 'distance' && e.ctrlKey) {
+            weapon.attack(this, objective, generalTimer, e);
+        }
+        console.log(collision);
     }
 
 }

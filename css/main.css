@@ -6,6 +6,7 @@ body {
 }
 
 #gra {
+    user-select: none; 
     display: block;
     margin-left: auto;
     margin-right: auto;

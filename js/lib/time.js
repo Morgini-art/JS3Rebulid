@@ -5,9 +5,10 @@ class Timer {
 
     checkTheTickTime() {
         for (var i = 0; i < this.listOfTicks.length; i++) {
-            if (this.listOfTicks[i].endTime == this.generalGameTime) {
+            if (this.listOfTicks[i].endTime === this.generalGameTime) {
                 this.listOfTicks[i].done = true;
-                //console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
+                console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
+                //this.listOfTicks[i].pop();
             }
         }
 
@@ -16,11 +17,12 @@ class Timer {
 }
 
 class Tick {
-    constructor(nameOfTick, startTime, endTime, done = false) {
+    constructor(nameOfTick, startTime, endTime, done = false, old = false) {
         this.nameOfTick = nameOfTick;
         this.startTime = startTime;
         this.endTime = endTime;
         this.done = done;
+        this.old = old;
     }
 }
 
