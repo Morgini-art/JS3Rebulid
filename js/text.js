@@ -22,16 +22,3 @@ function interpeter(text) {
 }
 
 export {interpeter};
-
-/*let test01 = 'CreateBullet{speed:5,distance:50,dmg:12}';
-test01 = interpeter(test01);
-
-
-
-console.log(test01);
-
-if (test01[1] >= 'distance:'+50) {
-    console.log('Daleko');
-} else {
-    console.log('Niedaleko');
-}*/

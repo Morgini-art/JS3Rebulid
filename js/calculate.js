@@ -12,6 +12,7 @@ let armorValue;
 let oldData;
 let newData;
 let outData;
+let type;
 
 function calculate(developMode = false)
 {
@@ -26,6 +27,7 @@ function calculate(developMode = false)
     speedLightAttack = document.getElementById('speed-light-attack').value;
     armorValue = document.getElementById('armor').value;
     resultsBox = document.getElementById('resultsbox');
+    type = document.getElementById('type').value;
     //Weapon
     
     //Hero
@@ -54,8 +56,9 @@ function calculate(developMode = false)
     {
         console.log('Develop Mode it is turned on');
         var name2 = "'"+name+"'";
+        var type2 = "'"+type+"'";
         console.log(name2);
-        outData += '<br>Kod:<br>new Weapon('+name2+','+minDmg+','+maxDmg+','+weight+','+energyLightAttack+','+speedLightAttack+')';
+        outData += '<br>Kod:<br>new Weapon('+name2+','+minDmg+','+maxDmg+','+weight+','+energyLightAttack+','+speedLightAttack+','+type2+')';
     }
     
     

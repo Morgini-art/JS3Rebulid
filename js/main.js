@@ -12,19 +12,23 @@ const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
 let trialWeapon1 = new Weapon('Sztylet', 6, 9, 1, 20, 400, 'melee'),
-    trialWeapon2 = new Weapon('Kusza', 8, 12, 5, 35, 16, 'distance');
+    trialWeapon2 = new Weapon('Kusza', 6, 9, 5, 35, 16, 'distance'),
+    trialWeapon3 = new Weapon('Pistolet', 1, 3, 5, 35, 16, 'distance', 10),
+    trialWeapon4 = new Weapon('Karabin Maszynowy',1,1,15,8,15,'distance',80);
 let enemy1 = new Enemy(20, 600, 50, 65, 40, trialWeapon1, new Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
 let enemyHitbox = new Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new Player(880, 80, 50, 65, 100, trialWeapon2, new Hitbox(undefined, undefined, 50, 65), 5, 3);
+let player1 = new Player(880, 80, 50, 65, 100, trialWeapon3 , new Hitbox(undefined, undefined, 50, 65), 5, 3);
 const generalTimer = new Timer();
 
 let bullets = [];
 
 let enemyColor = 'red';
 
+let showWeaponStatistic = false;
+
 console.log('Enemy: ',enemy1);
 console.log('Player: ',player1);
-console.log('Weapons: ',trialWeapon1,trialWeapon2);
+console.log('Weapons: ',trialWeapon1,trialWeapon2,trialWeapon3);
 
 console.log(player1.movingDirectionAxisX);
 
@@ -41,7 +45,20 @@ document.addEventListener('keyup', e => {
     if (player1.weapon.type === 'melee') {
         player1.playerAttack(e, collisionWith, enemy1, generalTimer);
     }
-});
+    if (e.keyCode === 49) {
+        player1.weapon = trialWeapon1;
+    } else if (e.keyCode === 50) {
+        player1.weapon = trialWeapon2;
+    } else if (e.keyCode === 51) {
+        player1.weapon = trialWeapon3;
+    } else if (e.keyCode === 52) {
+        player1.weapon = trialWeapon4;
+    }
+    
+    if (e.keyCode === 80) {
+        showWeaponStatistic = !showWeaponStatistic;
+    }
+}); 
 
 
 function drawAll(){
@@ -55,6 +72,10 @@ function drawAll(){
     drawText(15,20,'Hp:'+player1.hp, 'black', 23);
     drawText(15,40,'Your weapon:'+player1.weapon.name);
     drawText(15,60,'Type:'+player1.weapon.type);
+    if (showWeaponStatistic) {
+        drawText(15,85,'MinDmg:'+player1.weapon.minDmg);
+        drawText(15,105,'MaxDmg:'+player1.weapon.maxDmg);
+    }
 }
 
 function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
@@ -92,7 +113,8 @@ function gameLoop() {
         if (bullet.hitbox != null) {
             if (checkCollisionWith(bullet.hitbox, enemyHitbox)) {
                 enemyColor = 'blue';
-                enemy1.hp -= bullet.minDmg;
+                const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
+                enemy1.hp -= givenDmg;
                 bullets.splice(bullet,1);
             } else {
                 enemyColor = 'red';
@@ -139,7 +161,7 @@ function bulletsLoop() {
             rawData[1] = parseInt(rawData[1].substring(2)); //y
             rawData[2] = parseInt(rawData[2].substring(6)); //width
             rawData[3] = parseInt(rawData[3].substring(7)); //height
-            rawData[4] = parseInt(rawData[4].substring(6)); //speed
+            rawData[4] = parseInt(rawData[4].substring(6)); /*speed*/ console.log(rawData[4]);
             rawData[5] = parseInt(rawData[5].substring(7)); //mindmg   
             rawData[6] = parseInt(rawData[6].substring(7)); //maxdmg
             rawData[7] = parseInt(rawData[7].substring(8)); //targetX

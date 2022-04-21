@@ -536,16 +536,17 @@ const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 400, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza', 8, 12, 5, 35, 16, 'distance');
+let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 400, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza', 6, 9, 5, 35, 16, 'distance'), trialWeapon3 = new _weaponJs.Weapon('Pistolet', 1, 3, 5, 35, 16, 'distance', 10), trialWeapon4 = new _weaponJs.Weapon('Karabin Maszynowy', 1, 1, 15, 8, 15, 'distance', 80);
 let enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(880, 80, 50, 65, 100, trialWeapon2, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 3);
+let player1 = new _playerJs.Player(880, 80, 50, 65, 100, trialWeapon3, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 3);
 const generalTimer = new _timeJs.Timer();
 let bullets = [];
 let enemyColor = 'red';
+let showWeaponStatistic = false;
 console.log('Enemy: ', enemy1);
 console.log('Player: ', player1);
-console.log('Weapons: ', trialWeapon1, trialWeapon2);
+console.log('Weapons: ', trialWeapon1, trialWeapon2, trialWeapon3);
 console.log(player1.movingDirectionAxisX);
 let attackList = [];
 can.addEventListener('click', (e)=>{
@@ -556,6 +557,11 @@ can.addEventListener('click', (e)=>{
 document.addEventListener('keyup', (e)=>{
     const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
     if (player1.weapon.type === 'melee') player1.playerAttack(e, collisionWith, enemy1, generalTimer);
+    if (e.keyCode === 49) player1.weapon = trialWeapon1;
+    else if (e.keyCode === 50) player1.weapon = trialWeapon2;
+    else if (e.keyCode === 51) player1.weapon = trialWeapon3;
+    else if (e.keyCode === 52) player1.weapon = trialWeapon4;
+    if (e.keyCode === 80) showWeaponStatistic = !showWeaponStatistic;
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
@@ -566,6 +572,10 @@ function drawAll() {
     drawText(15, 20, 'Hp:' + player1.hp, 'black', 23);
     drawText(15, 40, 'Your weapon:' + player1.weapon.name);
     drawText(15, 60, 'Type:' + player1.weapon.type);
+    if (showWeaponStatistic) {
+        drawText(15, 85, 'MinDmg:' + player1.weapon.minDmg);
+        drawText(15, 105, 'MaxDmg:' + player1.weapon.maxDmg);
+    }
 }
 function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace') {
     ctx.fillStyle = fontColor;
@@ -592,7 +602,8 @@ function gameLoop() {
     for (const bullet of bullets)if (bullet.hitbox != null) {
         if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemyHitbox)) {
             enemyColor = 'blue';
-            enemy1.hp -= bullet.minDmg;
+            const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
+            enemy1.hp -= givenDmg;
             bullets.splice(bullet, 1);
         } else enemyColor = 'red';
     }
@@ -628,7 +639,8 @@ function bulletsLoop() {
         rawData[1] = parseInt(rawData[1].substring(2)); //y
         rawData[2] = parseInt(rawData[2].substring(6)); //width
         rawData[3] = parseInt(rawData[3].substring(7)); //height
-        rawData[4] = parseInt(rawData[4].substring(6)); //speed
+        rawData[4] = parseInt(rawData[4].substring(6)); /*speed*/ 
+        console.log(rawData[4]);
         rawData[5] = parseInt(rawData[5].substring(7)); //mindmg   
         rawData[6] = parseInt(rawData[6].substring(7)); //maxdmg
         rawData[7] = parseInt(rawData[7].substring(8)); //targetX
@@ -827,7 +839,7 @@ parcelHelpers.export(exports, "Weapon", ()=>Weapon
 );
 var _timeJs = require("./lib/time.js");
 class Weapon {
-    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack, type){
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack, type, bulletSpeed = 0){
         this.name = name;
         this.minDmg = minDmg;
         this.maxDmg = maxDmg;
@@ -835,9 +847,10 @@ class Weapon {
         this.energyLightAttack = energyLightAttack;
         this.speedLightAttack = speedLightAttack;
         this.type = type;
+        this.bulletSpeed = bulletSpeed;
     }
     attack(wieldingWeapons, objective, generalTimer, e) {
-        const { type , minDmg , maxDmg  } = this;
+        const { type , minDmg , maxDmg , bulletSpeed  } = this;
         const { x , y  } = wieldingWeapons;
         if (type === 'melee') {
             const givenDmg = Math.floor(Math.random() * (this.maxDmg - this.minDmg + 1) + this.minDmg);
@@ -847,7 +860,8 @@ class Weapon {
             console.log('Create a Bullet!');
             console.log('DMG:' + minDmg, maxDmg);
             //x, y, width, height, hitbox, speed, minDmg, maxDmg
-            generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+            if (bulletSpeed != 0) generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+            else generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
             console.log(generalTimer);
             console.log(e.offsetX);
         }
@@ -1002,18 +1016,7 @@ class Bullet {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "interpeter", ()=>interpeter
-) /*let test01 = 'CreateBullet{speed:5,distance:50,dmg:12}';
-test01 = interpeter(test01);
-
-
-
-console.log(test01);
-
-if (test01[1] >= 'distance:'+50) {
-    console.log('Daleko');
-} else {
-    console.log('Niedaleko');
-}*/ ;
+);
 //TODO: Chwilowa nazwa pliku!!!
 function interpeter(text) {
     let startArguments;
