@@ -1,5 +1,4 @@
 class Timer {
-    
     generalGameTime = 0;
     listOfTicks = new Array;
 
@@ -8,7 +7,6 @@ class Timer {
             if (this.listOfTicks[i].endTime === this.generalGameTime) {
                 this.listOfTicks[i].done = true;
                 console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
-                //this.listOfTicks[i].pop();
             }
         }
 

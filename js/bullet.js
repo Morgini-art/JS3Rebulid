@@ -33,8 +33,6 @@ class Bullet {
         this.movingDirectionAxisX = (x > targetX) ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
 
         this.movingDirectionAxisY = (y > targetY) ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        
-        console.log(this.movingDirectionAxisY);
     }
     
     move() {

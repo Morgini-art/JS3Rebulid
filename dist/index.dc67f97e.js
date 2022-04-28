@@ -527,51 +527,117 @@ parcelHelpers.export(exports, "drawText", ()=>drawText
 );
 var _hitboxJs = require("./hitbox.js");
 var _timeJs = require("./lib/time.js");
+var _invetoryJs = require("./invetory.js");
+var _textJs = require("./text.js"); //TODO: Chwilowa nazwa pliku!!!
 var _playerJs = require("./player.js");
 var _weaponJs = require("./weapon.js");
-var _enemyJs = require("./enemy.js");
 var _bulletJs = require("./bullet.js");
-var _textJs = require("./text.js"); //TODO: Chwilowa nazwa pliku!!!
+var _enemyJs = require("./enemy.js");
+var _itemJs = require("./item.js");
+var _chestJs = require("./chest.js");
 const can = document.getElementById('gra');
 const ctx = can.getContext('2d');
 const canWidth = can.width;
 const canHeight = can.height;
-let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 400, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza', 6, 9, 5, 35, 16, 'distance'), trialWeapon3 = new _weaponJs.Weapon('Pistolet', 1, 3, 5, 35, 16, 'distance', 10), trialWeapon4 = new _weaponJs.Weapon('Karabin Maszynowy', 1, 1, 15, 8, 15, 'distance', 80);
+let trialAmmunition1 = 'Pistol/Caliber9mm/Pistolet NTB';
+let trialAmmunition2 = 'Crosbow/ArrowHeadSize20mm/Kusza z XIV wieku';
+let actalIdOfAmmunition = 0;
+let gameChests = new _chestJs.GameChests();
+let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 340, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza z XIV wieku', 6, 15, 5, 35, 16, 'distance', 3, [
+    1,
+    1,
+    false,
+    1000,
+    trialAmmunition2
+]), trialWeapon3 = new _weaponJs.Weapon('Pistolet NTB', 1, 3, 5, 35, 16, 'distance', 10, [
+    6,
+    6,
+    false,
+    500,
+    trialAmmunition1
+]), trialWeapon4 = new _weaponJs.Weapon('Adminowy Karabin Maszynowy', 968359372299, 968359372299, 15, 8, 15, 'distance', 20, [
+    19800,
+    1,
+    false,
+    1
+]);
+let items = [
+    new _itemJs.Item('Test01', 3, 0, 'test01', false),
+    new _itemJs.Item('Test02', 7, 0, 'test02', false)
+];
 let enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
 let player1 = new _playerJs.Player(880, 80, 50, 65, 100, trialWeapon3, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 3);
+let playerInvetory = new _invetoryJs.Invetory();
+playerInvetory.numberOfBasicSlots = 15;
+playerInvetory.basicSlots.length = 15;
+for(let i = 0; i < playerInvetory.basicSlots.length; i++)playerInvetory.basicSlots[i] = new _invetoryJs.Slot(i);
 const generalTimer = new _timeJs.Timer();
 let bullets = [];
 let enemyColor = 'red';
 let showWeaponStatistic = false;
+let playerAmmunition = [
+    [
+        trialAmmunition1,
+        18
+    ],
+    [
+        trialAmmunition2,
+        5
+    ]
+];
+console.group('_MAIN');
 console.log('Enemy: ', enemy1);
 console.log('Player: ', player1);
 console.log('Weapons: ', trialWeapon1, trialWeapon2, trialWeapon3);
-console.log(player1.movingDirectionAxisX);
+console.log('Items: ', items);
+console.log('Invetory: ', playerInvetory);
+console.groupEnd('_MAIN');
 let attackList = [];
 can.addEventListener('click', (e)=>{
     const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
     player1.movingPlayer(e.offsetX, e.offsetY, e);
-    player1.playerAttack(e, collisionWith, enemy1, generalTimer);
+    player1.playerAttack(e, collisionWith, enemy1, generalTimer, playerAmmunition);
 });
 document.addEventListener('keyup', (e)=>{
     const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
     if (player1.weapon.type === 'melee') player1.playerAttack(e, collisionWith, enemy1, generalTimer);
     if (e.keyCode === 49) player1.weapon = trialWeapon1;
-    else if (e.keyCode === 50) player1.weapon = trialWeapon2;
-    else if (e.keyCode === 51) player1.weapon = trialWeapon3;
-    else if (e.keyCode === 52) player1.weapon = trialWeapon4;
+    else if (e.keyCode === 50) {
+        actalIdOfAmmunition = 1;
+        player1.weapon = trialWeapon2;
+    } else if (e.keyCode === 51) {
+        actalIdOfAmmunition = 0;
+        player1.weapon = trialWeapon3;
+    } else if (e.keyCode === 52) player1.weapon = trialWeapon4;
     if (e.keyCode === 80) showWeaponStatistic = !showWeaponStatistic;
+    else if (e.keyCode === 82) player1.weapon.reload(generalTimer, playerAmmunition);
+    else if (e.keyCode === 32) {
+        for (const chest of gameChests.chests)if (_hitboxJs.checkCollisionWith(player1.hitbox, chest.hitbox)) {
+            chest.open(player1, playerInvetory);
+            console.log(chest.open);
+        }
+    } else if (e.keyCode === 84) enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
     enemy1.drawEnemy(ctx, enemyColor);
     player1.drawPlayer(ctx);
     for (const bullet of bullets)bullet.drawBullet(ctx);
+    for (const chest of gameChests.chests)chest.drawChest(ctx);
+    for (const slot of playerInvetory.basicSlots)if (slot.content !== 'empty') {
+        console.log(slot.content);
+        drawText(980, 20, slot.content + `
+    `, 'black', 19);
+    }
     requestAnimationFrame(drawAll);
     drawText(15, 20, 'Hp:' + player1.hp, 'black', 23);
     drawText(15, 40, 'Your weapon:' + player1.weapon.name);
     drawText(15, 60, 'Type:' + player1.weapon.type);
+    if (player1.weapon.type === 'distance') {
+        drawText(15, 85, player1.weapon.distanceOptions[0] + '/' + player1.weapon.distanceOptions[1] + '  ' + playerAmmunition[actalIdOfAmmunition][1]);
+        if (player1.weapon.distanceOptions[2]) drawText(15, 105, 'Reloading...');
+    }
     if (showWeaponStatistic) {
         drawText(15, 85, 'MinDmg:' + player1.weapon.minDmg);
         drawText(15, 105, 'MaxDmg:' + player1.weapon.maxDmg);
@@ -586,26 +652,24 @@ function gameLoop() {
     const { listOfTicks  } = generalTimer;
     updateHitboxs();
     if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) {
-        if (enemy1.aiState != 'toattack') {
-            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
-            console.log(generalTimer.listOfTicks);
-        }
+        if (enemy1.aiState != 'toattack') generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
         enemy1.aiState = 'toattack';
     } else {
         enemy1.aiState = 'quest';
-        for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack' && !listOfTicks[i].done) {
+        for(let i1 = 0; i1 < listOfTicks.length; i1++)if (listOfTicks[i1].nameOfTick === 'EnemyLightAttack' && !listOfTicks[i1].done) {
             //console.log('The Tick Of Attack Enemy Has Be Taged: "old".');
-            listOfTicks[i].old = true;
-            i += listOfTicks.length + 1;
+            listOfTicks[i1].old = true;
+            i1 += listOfTicks.length + 1;
         }
     }
-    for (const bullet of bullets)if (bullet.hitbox != null) {
-        if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemyHitbox)) {
-            enemyColor = 'blue';
-            const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
-            enemy1.hp -= givenDmg;
-            bullets.splice(bullet, 1);
-        } else enemyColor = 'red';
+    for (const bullet of bullets){
+        if (bullet.hitbox != null) {
+            if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemyHitbox)) {
+                const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
+                enemy1.hp -= givenDmg;
+                bullets.splice(bullet, 1);
+            }
+        }
     }
 }
 function updateHitboxs() {
@@ -619,17 +683,21 @@ function updateHitboxs() {
     enemyHitbox.y = enemy1.y;
 }
 function enemyLoop() {
-    enemy1.enemyAi(attackList, player1, generalTimer);
+    enemy1.enemyAi(attackList, player1, generalTimer, gameChests);
     for (const bullet of bullets){
         bullet.move();
-        if (bullet.speed === 0 || bullet.distance === 0) {
-            bullets.splice(bullet, 1);
-            console.log(bullets);
-        }
+        if (bullet.speed === 0 || bullet.distance === 0) bullets.splice(bullet, 1);
     }
 }
 function playerLoop() {
+    const listOfTicks = generalTimer.listOfTicks;
     player1.playerMove();
+    for (const tick of listOfTicks)if (tick.nameOfTick === 'Reloading a player distance weapon' && tick.done && !tick.old) {
+        tick.old = true;
+        player1.weapon.distanceOptions[2] = false; //isReloading = false
+        player1.weapon.distanceOptions[0] = player1.weapon.distanceOptions[1]; //magazine = fullmagazine
+        break;
+    }
 }
 function bulletsLoop() {
     const listOfTicks = generalTimer.listOfTicks;
@@ -639,17 +707,14 @@ function bulletsLoop() {
         rawData[1] = parseInt(rawData[1].substring(2)); //y
         rawData[2] = parseInt(rawData[2].substring(6)); //width
         rawData[3] = parseInt(rawData[3].substring(7)); //height
-        rawData[4] = parseInt(rawData[4].substring(6)); /*speed*/ 
-        console.log(rawData[4]);
+        rawData[4] = parseInt(rawData[4].substring(6)); //speed
         rawData[5] = parseInt(rawData[5].substring(7)); //mindmg   
         rawData[6] = parseInt(rawData[6].substring(7)); //maxdmg
         rawData[7] = parseInt(rawData[7].substring(8)); //targetX
         rawData[8] = parseInt(rawData[8].substring(8)); //targetY
-        console.log(rawData);
         bullets.push(new _bulletJs.Bullet(rawData[0], rawData[1], rawData[2], rawData[3], new _hitboxJs.Hitbox(rawData[0], rawData[1], rawData[2], rawData[3]), rawData[4], rawData[5], rawData[6], rawData[7], rawData[8], 560));
         tick.old = true;
         for (const bullet of bullets)bullet.checkTheDirection(player1);
-        console.log(bullets[tick]);
         break;
     }
 }
@@ -660,7 +725,7 @@ setInterval(_timeJs.timeLoop, 1, generalTimer);
 setInterval(bulletsLoop, 20);
 requestAnimationFrame(drawAll);
 
-},{"./hitbox.js":"5AMNB","./lib/time.js":"lctuB","./player.js":"3yick","./weapon.js":"ihCsK","./enemy.js":"ey3S5","./bullet.js":"ZOjFr","./text.js":"1SSyA","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
+},{"./hitbox.js":"5AMNB","./lib/time.js":"lctuB","./invetory.js":"jGql3","./text.js":"1SSyA","./player.js":"3yick","./weapon.js":"ihCsK","./bullet.js":"ZOjFr","./enemy.js":"ey3S5","./item.js":"6mUxD","./chest.js":"6yugQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
@@ -727,7 +792,6 @@ class Timer {
         for(var i = 0; i < this.listOfTicks.length; i++)if (this.listOfTicks[i].endTime === this.generalGameTime) {
             this.listOfTicks[i].done = true;
             console.log('The Tick Has Be End: ' + this.listOfTicks[i].nameOfTick);
-        //this.listOfTicks[i].pop();
         }
         this.generalGameTime++;
     }
@@ -746,6 +810,45 @@ function timeLoop(timerObject) {
 //console.log(timerObject.generalGameTime);
 }
 
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jGql3":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Invetory", ()=>Invetory
+);
+parcelHelpers.export(exports, "Slot", ()=>Slot
+);
+class Invetory {
+    numberOfBasicSlots = 20;
+    basicSlots = [];
+}
+class Slot {
+    constructor(id, content = 'empty'){
+        this.id = id;
+        this.content = content;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1SSyA":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "interpeter", ()=>interpeter
+);
+//TODO: Chwilowa nazwa pliku!!!
+function interpeter(text) {
+    let startArguments;
+    let endArguments;
+    let results;
+    let commas = [];
+    let arguments = [];
+    for(let i = 0; i < text.length; i++){
+        if (text[i] === '{') startArguments = i;
+        else if (text[i] === '}') endArguments = i;
+        results = text.substring(startArguments + 1, endArguments);
+    }
+    arguments = results.split(',');
+    return arguments;
+}
+
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3yick":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -754,7 +857,7 @@ parcelHelpers.export(exports, "Player", ()=>Player
 var _creatureJs = require("./lib/creature.js");
 var _hitboxJs = require("./hitbox.js");
 class Player extends _creatureJs.Creature {
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed){
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition){
         super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
@@ -800,16 +903,12 @@ class Player extends _creatureJs.Creature {
             }
         }
     }
-    playerAttack(e, collision, objective, generalTimer) {
+    playerAttack(e, collision, objective, generalTimer, playerAmmunition) {
         const { weapon  } = this;
-        //console.log('Key Code: '+e.keyCode);
-        console.log('CTRL:', e.ctrlKey, collision);
-        console.log('Key Code: ' + e.key, 'Type: ' + weapon.type);
-        if (e.key === 'q' && collision && weapon.type === 'melee') {
-            weapon.attack(this, objective, generalTimer);
-            console.log(generalTimer.listOfTicks);
-        } else if (!collision && weapon.type === 'distance' && e.ctrlKey) weapon.attack(this, objective, generalTimer, e);
-        console.log(collision);
+        //console.log('CTRL:',e.ctrlKey, collision);
+        //console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
+        if (e.key === 'q' && collision && weapon.type === 'melee') weapon.attack(this, objective, generalTimer);
+        else if (!collision && weapon.type === 'distance' && e.ctrlKey) weapon.attack(this, objective, generalTimer, e, playerAmmunition);
     }
 }
 
@@ -839,7 +938,7 @@ parcelHelpers.export(exports, "Weapon", ()=>Weapon
 );
 var _timeJs = require("./lib/time.js");
 class Weapon {
-    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack, type, bulletSpeed = 0){
+    constructor(name, minDmg, maxDmg, weight, energyLightAttack, speedLightAttack, type, bulletSpeed = 0, distanceOptions){
         this.name = name;
         this.minDmg = minDmg;
         this.maxDmg = maxDmg;
@@ -848,112 +947,42 @@ class Weapon {
         this.speedLightAttack = speedLightAttack;
         this.type = type;
         this.bulletSpeed = bulletSpeed;
+        this.distanceOptions = distanceOptions;
     }
-    attack(wieldingWeapons, objective, generalTimer, e) {
+    reload(generalTimer, ammunition) {
+        const { distanceOptions , type  } = this;
+        if (type === 'distance') {
+            const magazine = distanceOptions[0];
+            const fullMagazine = distanceOptions[1];
+            const isReloading = distanceOptions[2];
+            const reloadingTime = distanceOptions[3];
+            if (!isReloading && magazine < fullMagazine) {
+                for (const ammo of ammunition)if (distanceOptions[4] === ammo[0] && ammo[1] > 0) {
+                    generalTimer.listOfTicks.push(new _timeJs.Tick('Reloading a player distance weapon', generalTimer.generalGameTime, generalTimer.generalGameTime + reloadingTime));
+                    this.distanceOptions[2] = true;
+                    ammo[1] = ammo[1] - (fullMagazine - magazine);
+                }
+            }
+        }
+    }
+    attack(wieldingWeapons, objective, generalTimer, e, playerAmmunition) {
         const { type , minDmg , maxDmg , bulletSpeed  } = this;
         const { x , y  } = wieldingWeapons;
         if (type === 'melee') {
             const givenDmg = Math.floor(Math.random() * (this.maxDmg - this.minDmg + 1) + this.minDmg);
             objective.hp -= givenDmg;
-        //console.log('A melle attack');
         } else if (type === 'distance') {
-            console.log('Create a Bullet!');
-            console.log('DMG:' + minDmg, maxDmg);
-            //x, y, width, height, hitbox, speed, minDmg, maxDmg
-            if (bulletSpeed != 0) generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
-            else generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
-            console.log(generalTimer);
-            console.log(e.offsetX);
-        }
-    }
-}
-
-},{"./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Enemy", ()=>Enemy
-);
-var _creatureJs = require("./lib/creature.js");
-var _mainJs = require("./main.js");
-var _timeJs = require("./lib/time.js");
-class Enemy extends _creatureJs.Creature {
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, defendChance, drop, dropAmount){
-        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
-        this.objectiveX;
-        this.objectiveY;
-        this.defendChance = defendChance;
-        this.drop = drop;
-        this.dropAmount = dropAmount;
-        this.isAlive = true;
-        this.aiState = 'quest';
-        this.walkingDirectionX = 'none';
-        this.walkingDirectionY = 'none';
-    }
-    drawEnemy(ctx, color) {
-        const { x , y , width , height  } = this;
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, width, height);
-        _mainJs.drawText(x + 5, y - 5, 'Hp:' + this.hp, 'black', 17);
-    }
-    wherePlayer(playerObject) {
-        const { x , y  } = this;
-        if (playerObject.x > x) {
-            this.walkingDirectionX = 'Right';
-            this.objectiveX = playerObject.x;
-        } else {
-            this.walkingDirectionX = 'Left';
-            this.objectiveX = playerObject.x;
-        }
-        if (playerObject.y > y) {
-            this.walkingDirectionY = 'Down';
-            this.objectiveY = playerObject.y;
-        } else {
-            this.walkingDirectionY = 'Up';
-            this.objectiveY = playerObject.y;
-        }
-    }
-    moveToPlayer(playerObject) {
-        const { x , y , walkingDirectionX , walkingDirectionY , movingSpeed  } = this;
-        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= movingSpeed;
-        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += movingSpeed;
-        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= movingSpeed;
-        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += movingSpeed;
-    }
-    enemyAi(attackList, playerObject, generalTimer) {
-        const { isAlive , aiState , weapon  } = this;
-        const { listOfTicks  } = generalTimer;
-        if (isAlive) {
-            this.wherePlayer(playerObject);
-            if (aiState === 'quest') {
-                this.moveToPlayer(playerObject);
-                attackList.pop();
-            //generalTimer.listOfTicks.pop();
-            //console.log('The Last Tick has be deleted');
-            } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] !== 'EnemyLightAttack') attackList.push('EnemyLightAttack');
-                var attackIs = false;
-                //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
-                while(!attackIs){
-                    for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack') {
-                        if (listOfTicks[i].done && !listOfTicks[i].old) {
-                            attackList.pop();
-                            console.log('Attack!');
-                            this.weapon.attack(this, playerObject, generalTimer);
-                            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
-                            //console.log(generalTimer.listOfTicks);
-                            listOfTicks[i].old = true;
-                            attackIs = true;
-                            i += listOfTicks.length + 1;
-                        }
-                        attackIs = true;
-                    }
-                }
+            if (this.distanceOptions[0] != 0 && !this.distanceOptions[2]) {
+                if (bulletSpeed != 0) generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+                else generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+                this.distanceOptions[0]--;
             }
+            if (!this.distanceOptions[2] && this.distanceOptions[0] === 0) this.reload(generalTimer, playerAmmunition);
         }
     }
 }
 
-},{"./lib/creature.js":"6wrLr","./main.js":"e0TrB","./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ZOjFr":[function(require,module,exports) {
+},{"./lib/time.js":"lctuB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ZOjFr":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Bullet", ()=>Bullet
@@ -984,7 +1013,6 @@ class Bullet {
         const { x , y  } = wieldingWeapon;
         this.movingDirectionAxisX = x > targetX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
         this.movingDirectionAxisY = y > targetY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
-        console.log(this.movingDirectionAxisY);
     }
     move() {
         const { x , y , movingDirectionAxisX , movingDirectionAxisY , speed , targetX , targetY  } = this;
@@ -1012,25 +1040,161 @@ class Bullet {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1SSyA":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ey3S5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "interpeter", ()=>interpeter
+parcelHelpers.export(exports, "Enemy", ()=>Enemy
 );
-//TODO: Chwilowa nazwa pliku!!!
-function interpeter(text) {
-    let startArguments;
-    let endArguments;
-    let results;
-    let commas = [];
-    let arguments = [];
-    for(let i = 0; i < text.length; i++){
-        if (text[i] === '{') startArguments = i;
-        else if (text[i] === '}') endArguments = i;
-        results = text.substring(startArguments + 1, endArguments);
+var _creatureJs = require("./lib/creature.js");
+var _mainJs = require("./main.js");
+var _timeJs = require("./lib/time.js");
+var _chestJs = require("./chest.js");
+var _hitboxJs = require("./hitbox.js");
+class Enemy extends _creatureJs.Creature {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, defendChance, drop, dropAmount){
+        super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
+        this.objectiveX;
+        this.objectiveY;
+        this.defendChance = defendChance;
+        this.drop = drop;
+        this.dropAmount = dropAmount;
+        this.isAlive = true;
+        this.aiState = 'quest';
+        this.walkingDirectionX = 'none';
+        this.walkingDirectionY = 'none';
     }
-    arguments = results.split(',');
-    return arguments;
+    drawEnemy(ctx, color) {
+        const { x , y , width , height , isAlive  } = this;
+        ctx.fillStyle = color;
+        if (!isAlive) ctx.fillStyle = 'black';
+        else {
+            ctx.fillRect(x, y, width, height);
+            _mainJs.drawText(x + 5, y - 5, 'Hp:' + this.hp, 'black', 17);
+        }
+    }
+    wherePlayer(playerObject) {
+        const { x , y  } = this;
+        if (playerObject.x > x) {
+            this.walkingDirectionX = 'Right';
+            this.objectiveX = playerObject.x;
+        } else {
+            this.walkingDirectionX = 'Left';
+            this.objectiveX = playerObject.x;
+        }
+        if (playerObject.y > y) {
+            this.walkingDirectionY = 'Down';
+            this.objectiveY = playerObject.y;
+        } else {
+            this.walkingDirectionY = 'Up';
+            this.objectiveY = playerObject.y;
+        }
+    }
+    moveToPlayer(playerObject) {
+        const { x , y , walkingDirectionX , walkingDirectionY , movingSpeed  } = this;
+        if (walkingDirectionX === 'Left' && x != playerObject.x) this.x -= movingSpeed;
+        else if (walkingDirectionX === 'Right' && x != playerObject.x) this.x += movingSpeed;
+        if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= movingSpeed;
+        else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += movingSpeed;
+    }
+    afterDeath(chests) {
+        this.isAlive = false;
+        const { x , y , drop , dropAmount  } = this;
+        chests.chests.push(new _chestJs.Chest(x, y, 30, 30, new _hitboxJs.Hitbox(x, y, 30, 30), drop));
+        console.log(chests);
+    }
+    enemyAi(attackList, playerObject, generalTimer, chests) {
+        const { isAlive , aiState , weapon , hp  } = this;
+        const { listOfTicks  } = generalTimer;
+        if (hp <= 0) {
+            if (isAlive) this.afterDeath(chests);
+            this.isAlive = false;
+        } else if (isAlive) {
+            this.wherePlayer(playerObject);
+            if (aiState === 'quest') {
+                this.moveToPlayer(playerObject);
+                attackList.pop();
+            //generalTimer.listOfTicks.pop();
+            //console.log('The Last Tick has be deleted');
+            } else if (aiState === 'toattack') {
+                if (attackList[attackList.length - 1] !== 'EnemyLightAttack') attackList.push('EnemyLightAttack');
+                var attackIs = false;
+                //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
+                while(!attackIs){
+                    for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack') {
+                        if (listOfTicks[i].done && !listOfTicks[i].old) {
+                            attackList.pop();
+                            this.weapon.attack(this, playerObject, generalTimer);
+                            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                            listOfTicks[i].old = true;
+                            attackIs = true;
+                            i += listOfTicks.length + 1;
+                        }
+                        attackIs = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+},{"./lib/creature.js":"6wrLr","./main.js":"e0TrB","./lib/time.js":"lctuB","./chest.js":"6yugQ","./hitbox.js":"5AMNB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6yugQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Chest", ()=>Chest
+);
+parcelHelpers.export(exports, "GameChests", ()=>GameChests
+);
+class Chest {
+    constructor(x, y, width, height, hitbox, content, icon = 'item', isOpen = false){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.hitbox = hitbox;
+        this.content = content;
+        this.icon = icon;
+        this.isOpen = isOpen;
+    }
+    drawChest(ctx) {
+        const { x , y , width , height , icon  } = this;
+        if (icon === 'item') ctx.fillStyle = '#239db0';
+        else if (icon === 'chest') ctx.fillStyle = '#b0531e';
+        ctx.fillRect(x, y, width, height);
+    }
+    open(opener, openerInvetory) {
+        const { isOpen , content  } = this;
+        if (!isOpen) {
+            this.isOpen = true;
+            var end = false;
+            openerInvetory.basicSlots.forEach((slot, actualId)=>{
+                if (slot.content === 'empty' && !end) {
+                    openerInvetory.basicSlots[actualId].content = content;
+                    console.log(openerInvetory.basicSlots);
+                    console.log(slot);
+                    end = true;
+                }
+            });
+        }
+    }
+}
+class GameChests {
+    chests = [];
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6mUxD":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Item", ()=>Item
+);
+class Item {
+    constructor(name, price, type, rarity, effect, toBuyInShop){
+        this.ItemName = name;
+        this.ItemPrice = price;
+        this.ItemType = type;
+        this.ItemRarity = rarity; //(0)ordinary,(1)unusual,(2)unusual,(3)epic,(4)legendary
+        this.ItemEffect = effect;
+        this.toBuyInShop = toBuyInShop;
+    }
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2v9qX","e0TrB"], "e0TrB", "parcelRequire94c2")

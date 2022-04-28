@@ -2,7 +2,7 @@ import {Creature} from './lib/creature.js';
 import {Hitbox} from './hitbox.js';
 
 class Player extends Creature{
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed) {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition) {
         super(x, y, width, height, hitbox, weapon, hp ,movingSpeed);
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
@@ -90,19 +90,16 @@ class Player extends Creature{
         }
     }
 
-    playerAttack(e, collision, objective, generalTimer) {
+    playerAttack(e, collision, objective, generalTimer, playerAmmunition) {
         const {weapon} = this;
-        //console.log('Key Code: '+e.keyCode);
-        console.log('CTRL:',e.ctrlKey, collision);
-        console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
+        //console.log('CTRL:',e.ctrlKey, collision);
+        //console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
         
         if (e.key === 'q' && collision && weapon.type === 'melee') {
             weapon.attack(this, objective, generalTimer);
-            console.log(generalTimer.listOfTicks);
         } else if (!collision && weapon.type === 'distance' && e.ctrlKey) {
-            weapon.attack(this, objective, generalTimer, e);
+            weapon.attack(this, objective, generalTimer, e, playerAmmunition);
         }
-        console.log(collision);
     }
 
 }
