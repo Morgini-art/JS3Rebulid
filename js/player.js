@@ -2,13 +2,15 @@ import {Creature} from './lib/creature.js';
 import {Hitbox} from './hitbox.js';
 
 class Player extends Creature{
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition) {
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition, magicEnergy) {
         super(x, y, width, height, hitbox, weapon, hp ,movingSpeed);
+        this.ammunition = ammunition;
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
         this.targetX;
         this.targetY;
         this.isMovingX;
+        this.isMovingY;
         this.isMovingY;
     }
 
@@ -91,14 +93,14 @@ class Player extends Creature{
     }
 
     playerAttack(e, collision, objective, generalTimer, playerAmmunition) {
-        const {weapon} = this;
+        const {weapon, ammunition} = this;
         //console.log('CTRL:',e.ctrlKey, collision);
         //console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
-        
+        //console.log(collision);
         if (e.key === 'q' && collision && weapon.type === 'melee') {
             weapon.attack(this, objective, generalTimer);
-        } else if (!collision && weapon.type === 'distance' && e.ctrlKey) {
-            weapon.attack(this, objective, generalTimer, e, playerAmmunition);
+        } else if (!collision && weapon.type === 'distance' && e.button === 2) {
+            weapon.attack(this, objective, generalTimer, e, ammunition, 'player');
         }
     }
 

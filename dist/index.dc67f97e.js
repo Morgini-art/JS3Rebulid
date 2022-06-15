@@ -534,74 +534,160 @@ var _weaponJs = require("./weapon.js");
 var _bulletJs = require("./bullet.js");
 var _enemyJs = require("./enemy.js");
 var _itemJs = require("./item.js");
+var _spellJs = require("./spell.js");
 var _chestJs = require("./chest.js");
-const can = document.getElementById('gra');
-const ctx = can.getContext('2d');
-const canWidth = can.width;
-const canHeight = can.height;
-let trialAmmunition1 = 'Pistol/Caliber9mm/Pistolet NTB';
-let trialAmmunition2 = 'Crosbow/ArrowHeadSize20mm/Kusza z XIV wieku';
+var _keyboardJs = require("./keyboard.js");
+var _languageJs = require("./language.js");
+//Language
+let menuUi = [
+    'Hp:',
+    'Your weapon:',
+    'Type:',
+    'Reloading...'
+];
+let gameLanguage = 'PL';
+menuUi = _languageJs.loadMenuLanguage(menuUi, _languageJs.polishLanguageMenuUi);
+//Language
+//Canvas Variables
+const can = document.getElementById('gra'), ctx = can.getContext('2d');
+const canWidth = can.width, canHeight = can.height;
+//Canvas Variables
+window.scrollTo = function() {
+    console.log('i zablokowane :>');
+};
+//Weapon's and Item's Variables
+let trialAmmunition1 = 'Pistol/Caliber9mm/Pistolet NTB', trialAmmunition2 = 'Crosbow/ArrowHeadSize20mm/Kusza z XIV wieku', trialAmmunition3 = 'Rifle/Caliber12mm/Adminowy Karabin Maszynowy', trialAmmunition4 = 'Pistol/Caliber12mm/Pistolet XD';
 let actalIdOfAmmunition = 0;
-let gameChests = new _chestJs.GameChests();
 let trialWeapon1 = new _weaponJs.Weapon('Sztylet', 6, 9, 1, 20, 340, 'melee'), trialWeapon2 = new _weaponJs.Weapon('Kusza z XIV wieku', 6, 15, 5, 35, 16, 'distance', 3, [
     1,
     1,
     false,
     1000,
     trialAmmunition2
-]), trialWeapon3 = new _weaponJs.Weapon('Pistolet NTB', 1, 3, 5, 35, 16, 'distance', 10, [
-    6,
-    6,
+]), //trialWeapon3 = new Weapon('Pistolet NTB', 1, 3, 5, 35, 16, 'distance', 10, [6,6,false,500,trialAmmunition1]),
+trialWeapon3 = new _weaponJs.Weapon('Pistolet XD', 2, 3, 5, 35, 16, 'distance', 8, [
+    20,
+    20,
     false,
     500,
     trialAmmunition1
-]), trialWeapon4 = new _weaponJs.Weapon('Adminowy Karabin Maszynowy', 968359372299, 968359372299, 15, 8, 15, 'distance', 20, [
-    19800,
+]), trialWeapon4 = new _weaponJs.Weapon('Adminowy Karabin Maszynowy', 968359372299, 968359372299, 15, 8, 15, 'distance', 15, [
+    'infinity',
     1,
     false,
-    1
+    1,
+    trialAmmunition3
 ]);
 let items = [
     new _itemJs.Item('Test01', 3, 0, 'test01', false),
     new _itemJs.Item('Test02', 7, 0, 'test02', false)
-];
-let enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
+]; //Weapon's and Item's Variables
+//Definition of Class
+let enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, items[0], 1);
 let enemyHitbox = new _hitboxJs.Hitbox(enemy1.x, enemy1.y, enemy1.width, enemy1.height);
-let player1 = new _playerJs.Player(880, 80, 50, 65, 100, trialWeapon3, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, 3);
+let player1 = new _playerJs.Player(can.width / 2 - 50, can.height / 2, 50, 65, 100, null, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 5, [
+    [
+        trialAmmunition1,
+        80
+    ],
+    [
+        trialAmmunition2,
+        9
+    ],
+    [
+        trialAmmunition3,
+        'infinity'
+    ]
+]);
+player1.weapon = trialWeapon3;
 let playerInvetory = new _invetoryJs.Invetory();
+let gameChests = new _chestJs.GameChests();
+gameChests.chests.push(new _chestJs.Chest(50, 50, 50, 50, new _hitboxJs.Hitbox(50, 50, 50, 50), 'nothing'));
+const generalTimer = new _timeJs.Timer(), keyboardPlayerInput = new _keyboardJs.KeyboardInput();
 playerInvetory.numberOfBasicSlots = 15;
 playerInvetory.basicSlots.length = 15;
-for(let i = 0; i < playerInvetory.basicSlots.length; i++)playerInvetory.basicSlots[i] = new _invetoryJs.Slot(i);
-const generalTimer = new _timeJs.Timer();
+//Definition of Class
+_invetoryJs.fillInvetoryWithSlots(playerInvetory);
 let bullets = [];
-let enemyColor = 'red';
 let showWeaponStatistic = false;
 let playerAmmunition = [
     [
         trialAmmunition1,
-        18
+        80
     ],
     [
         trialAmmunition2,
-        5
+        9
+    ],
+    [
+        trialAmmunition3,
+        'infinity'
     ]
 ];
+//let enemyAmmunition = ;
+let enemies = [
+    new _enemyJs.Enemy(0, 1080, 20, 50, 65, 40, trialWeapon3, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, items[0], 1, 0, [
+        [
+            trialAmmunition1,
+            'infinity'
+        ],
+        [
+            trialAmmunition3,
+            'infinity'
+        ]
+    ]),
+    new _enemyJs.Enemy(1, 20, 700, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, items[0], 1, 1, [
+        [
+            trialAmmunition1,
+            'infinity'
+        ],
+        [
+            trialAmmunition3,
+            'infinity'
+        ]
+    ]),
+    new _enemyJs.Enemy(2, 450, 560, 50, 65, 40, trialWeapon2, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, items[1], 1, 0, [
+        [
+            trialAmmunition1,
+            'infinity'
+        ],
+        [
+            trialAmmunition3,
+            'infinity'
+        ]
+    ])
+];
+console.log(enemies[0]);
+console.log(trialWeapon3);
 console.group('_MAIN');
-console.log('Enemy: ', enemy1);
+console.log('Enemies: ', enemies);
 console.log('Player: ', player1);
-console.log('Weapons: ', trialWeapon1, trialWeapon2, trialWeapon3);
+console.log('Weapons: ', trialWeapon1, trialWeapon2, trialWeapon3, trialWeapon4);
 console.log('Items: ', items);
 console.log('Invetory: ', playerInvetory);
+console.log(enemies[0].x);
 console.groupEnd('_MAIN');
 let attackList = [];
 can.addEventListener('click', (e)=>{
-    const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
+    for (const enemy of enemies){
+        const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemy.hitbox);
+        player1.playerAttack(e, collisionWith, enemy, generalTimer, playerAmmunition);
+    }
     player1.movingPlayer(e.offsetX, e.offsetY, e);
-    player1.playerAttack(e, collisionWith, enemy1, generalTimer, playerAmmunition);
+});
+can.addEventListener('contextmenu', (e)=>{
+    e.preventDefault();
+    for (const enemy of enemies){
+        const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemy.hitbox);
+        player1.playerAttack(e, collisionWith, enemy, generalTimer, playerAmmunition);
+        break;
+    }
 });
 document.addEventListener('keyup', (e)=>{
-    const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox);
-    if (player1.weapon.type === 'melee') player1.playerAttack(e, collisionWith, enemy1, generalTimer);
+    for (const enemy of enemies){
+        const collisionWith = _hitboxJs.checkCollisionWith(player1.hitbox, enemy.hitbox);
+        if (player1.weapon.type === 'melee') player1.playerAttack(e, collisionWith, enemy, generalTimer);
+    }
     if (e.keyCode === 49) player1.weapon = trialWeapon1;
     else if (e.keyCode === 50) {
         actalIdOfAmmunition = 1;
@@ -613,30 +699,24 @@ document.addEventListener('keyup', (e)=>{
     if (e.keyCode === 80) showWeaponStatistic = !showWeaponStatistic;
     else if (e.keyCode === 82) player1.weapon.reload(generalTimer, playerAmmunition);
     else if (e.keyCode === 32) {
-        for (const chest of gameChests.chests)if (_hitboxJs.checkCollisionWith(player1.hitbox, chest.hitbox)) {
-            chest.open(player1, playerInvetory);
-            console.log(chest.open);
-        }
-    } else if (e.keyCode === 84) enemy1 = new _enemyJs.Enemy(20, 600, 50, 65, 40, trialWeapon1, new _hitboxJs.Hitbox(undefined, undefined, 50, 65), 2, 1, 'gold', 4);
+        for (const chest of gameChests.chests)if (_hitboxJs.checkCollisionWith(player1.hitbox, chest.hitbox)) chest.open(player1, playerInvetory);
+    } else if (e.keyCode === 84) ;
+    else if (e.keyCode === 73) playerInvetory.show = !playerInvetory.show;
 });
 function drawAll() {
     ctx.clearRect(0, 0, canWidth, canHeight);
-    enemy1.drawEnemy(ctx, enemyColor);
+    for (const enemy of enemies)enemy.drawEnemy(ctx, 'red');
     player1.drawPlayer(ctx);
     for (const bullet of bullets)bullet.drawBullet(ctx);
     for (const chest of gameChests.chests)chest.drawChest(ctx);
-    for (const slot of playerInvetory.basicSlots)if (slot.content !== 'empty') {
-        console.log(slot.content);
-        drawText(980, 20, slot.content + `
-    `, 'black', 19);
-    }
+    playerInvetory.drawInvetory(ctx, drawTextManyLines);
     requestAnimationFrame(drawAll);
-    drawText(15, 20, 'Hp:' + player1.hp, 'black', 23);
-    drawText(15, 40, 'Your weapon:' + player1.weapon.name);
-    drawText(15, 60, 'Type:' + player1.weapon.type);
+    drawText(15, 20, menuUi[0] + player1.hp, 'black', 23);
+    drawText(15, 40, menuUi[1] + player1.weapon.name);
+    drawText(15, 60, menuUi[2] + _languageJs.langConvert(player1.weapon.type, gameLanguage));
     if (player1.weapon.type === 'distance') {
-        drawText(15, 85, player1.weapon.distanceOptions[0] + '/' + player1.weapon.distanceOptions[1] + '  ' + playerAmmunition[actalIdOfAmmunition][1]);
-        if (player1.weapon.distanceOptions[2]) drawText(15, 105, 'Reloading...');
+        drawText(15, 85, player1.weapon.distanceOptions[0] + '/' + player1.weapon.distanceOptions[1] + '  ' + player1.ammunition[actalIdOfAmmunition][1]);
+        if (player1.weapon.distanceOptions[2]) drawText(15, 105, menuUi[3]);
     }
     if (showWeaponStatistic) {
         drawText(15, 85, 'MinDmg:' + player1.weapon.minDmg);
@@ -648,27 +728,48 @@ function drawText(textX, textY, textToDisplay, fontColor, fontSize, fontFamily =
     ctx.font = fontSize + 'px ' + fontFamily;
     ctx.fillText(textToDisplay, textX, textY);
 }
+function drawTextManyLines(textX, textY, textToDisplay, fontColor, fontSize, fontFamily = 'Monospace', lines, optionalTextAdds = 0) {
+    let counterY = textY;
+    for(let i = 0; i < lines; i++){
+        if (optionalTextAdds === 'Invetory/content') drawText(textX, counterY, _languageJs.langConvert(textToDisplay[i].content, gameLanguage), fontColor, fontSize, fontFamily);
+        else drawText(textX, counterY, textToDisplay[i], fontColor, fontSize, fontFamily);
+        counterY += fontSize + 2;
+    }
+}
 function gameLoop() {
     const { listOfTicks  } = generalTimer;
     updateHitboxs();
-    if (_hitboxJs.checkCollisionWith(player1.hitbox, enemyHitbox)) {
-        if (enemy1.aiState != 'toattack') generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + enemy1.weapon.speedLightAttack));
-        enemy1.aiState = 'toattack';
-    } else {
-        enemy1.aiState = 'quest';
-        for(let i1 = 0; i1 < listOfTicks.length; i1++)if (listOfTicks[i1].nameOfTick === 'EnemyLightAttack' && !listOfTicks[i1].done) {
-            //console.log('The Tick Of Attack Enemy Has Be Taged: "old".');
-            listOfTicks[i1].old = true;
-            i1 += listOfTicks.length + 1;
+    for (const enemy of enemies)if (enemy.aiState !== 'dodge') {
+        //console.log('1:' + enemy.aiState, '2:' + enemy.secondAiState);
+        if (enemy.weapon.type === 'distance' && enemy.aiState !== 'shooting') enemy.secondAiState = 'icanshoot?';
+        if (_hitboxJs.checkCollisionWith(player1.hitbox, enemy.hitbox) && enemy.weapon.type === 'melee') {
+            if (enemy.aiState != 'toattack') {
+                generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack EnemyId:' + enemy.id, generalTimer.generalGameTime, generalTimer.generalGameTime + enemy.weapon.speedLightAttack));
+                console.log('ADD');
+            }
+            enemy.aiState = 'toattack';
+        } else {
+            if (enemy.weapon.type === 'distance' && enemy.aiState !== 'shooting') enemy.aiState = 'quest';
+            else if (enemy.weapon.type !== 'distance') enemy.aiState = 'quest';
+            for (const tick of listOfTicks)if (enemy.weapon.type === 'melee' && tick.nameOfTick === 'EnemyLightAttack EnemyId:' + enemy.id && !tick.done) {
+                console.log(tick);
+                //console.log('The Tick Of Attack Enemy Has Be Taged: "old".');
+                tick.old = true;
+                break;
+            }
         }
     }
-    for (const bullet of bullets){
-        if (bullet.hitbox != null) {
-            if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemyHitbox)) {
-                const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
-                enemy1.hp -= givenDmg;
-                bullets.splice(bullet, 1);
-            }
+    for (const bullet of bullets)if (bullet.hitbox != null) {
+        for (const enemy of enemies)//console.log(bullet.owner);
+        if (_hitboxJs.checkCollisionWith(bullet.hitbox, enemy.hitbox) && enemy.hitboxActive && bullet.owner === 'player') {
+            const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
+            enemy.hp -= givenDmg;
+            bullets.splice(bullet, 1);
+        }
+        if (_hitboxJs.checkCollisionWith(bullet.hitbox, player1.hitbox) && bullet.owner.substr(0, 5) === 'enemy') {
+            const givenDmg = Math.floor(Math.random() * (bullet.maxDmg - bullet.minDmg + 1) + bullet.minDmg);
+            player1.hp -= givenDmg;
+            bullets.splice(bullet, 1);
         }
     }
 }
@@ -679,11 +780,13 @@ function updateHitboxs() {
     }
     player1.hitbox.x = player1.x;
     player1.hitbox.y = player1.y;
-    enemyHitbox.x = enemy1.x;
-    enemyHitbox.y = enemy1.y;
+    for (const enemy of enemies)if (enemy.hitboxActive) {
+        enemy.hitbox.x = enemy.x;
+        enemy.hitbox.y = enemy.y;
+    }
 }
 function enemyLoop() {
-    enemy1.enemyAi(attackList, player1, generalTimer, gameChests);
+    for (const enemy of enemies)enemy.enemyAi(attackList, player1, generalTimer, gameChests, bullets);
     for (const bullet of bullets){
         bullet.move();
         if (bullet.speed === 0 || bullet.distance === 0) bullets.splice(bullet, 1);
@@ -712,9 +815,14 @@ function bulletsLoop() {
         rawData[6] = parseInt(rawData[6].substring(7)); //maxdmg
         rawData[7] = parseInt(rawData[7].substring(8)); //targetX
         rawData[8] = parseInt(rawData[8].substring(8)); //targetY
-        bullets.push(new _bulletJs.Bullet(rawData[0], rawData[1], rawData[2], rawData[3], new _hitboxJs.Hitbox(rawData[0], rawData[1], rawData[2], rawData[3]), rawData[4], rawData[5], rawData[6], rawData[7], rawData[8], 560));
+        rawData[9] = rawData[9].substring(6); //owner
+        console.log(rawData[9]);
+        bullets.push(new _bulletJs.Bullet(rawData[0], rawData[1], rawData[2], rawData[3], new _hitboxJs.Hitbox(rawData[0], rawData[1], rawData[2], rawData[3]), rawData[4], rawData[5], rawData[6], rawData[7], rawData[8], 560, rawData[9]));
         tick.old = true;
-        for (const bullet of bullets)bullet.checkTheDirection(player1);
+        for (const bullet of bullets)if (bullet.owner === 'player') bullet.checkTheDirection(player1);
+        else {
+            for (const enemy of enemies)if (enemy.id === Number(bullet.owner.substr(8))) bullet.checkTheDirection(enemy);
+        }
         break;
     }
 }
@@ -725,7 +833,7 @@ setInterval(_timeJs.timeLoop, 1, generalTimer);
 setInterval(bulletsLoop, 20);
 requestAnimationFrame(drawAll);
 
-},{"./hitbox.js":"5AMNB","./lib/time.js":"lctuB","./invetory.js":"jGql3","./text.js":"1SSyA","./player.js":"3yick","./weapon.js":"ihCsK","./bullet.js":"ZOjFr","./enemy.js":"ey3S5","./item.js":"6mUxD","./chest.js":"6yugQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5AMNB":[function(require,module,exports) {
+},{"./hitbox.js":"5AMNB","./lib/time.js":"lctuB","./invetory.js":"jGql3","./text.js":"1SSyA","./player.js":"3yick","./weapon.js":"ihCsK","./bullet.js":"ZOjFr","./enemy.js":"ey3S5","./item.js":"6mUxD","./chest.js":"6yugQ","./keyboard.js":"5GGKT","./language.js":"dZNi5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./spell.js":"4Vft0"}],"5AMNB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Hitbox", ()=>Hitbox
@@ -817,15 +925,25 @@ parcelHelpers.export(exports, "Invetory", ()=>Invetory
 );
 parcelHelpers.export(exports, "Slot", ()=>Slot
 );
+parcelHelpers.export(exports, "fillInvetoryWithSlots", ()=>fillInvetoryWithSlots
+);
 class Invetory {
     numberOfBasicSlots = 20;
     basicSlots = [];
+    show = false;
+    drawInvetory(ctx, functionDrawText) {
+        const { basicSlots , numberOfBasicSlots , show  } = this;
+        if (show) functionDrawText(1080, 40, basicSlots, 'black', 20, 'Monospace', numberOfBasicSlots, 'Invetory/content');
+    }
 }
 class Slot {
     constructor(id, content = 'empty'){
         this.id = id;
         this.content = content;
     }
+}
+function fillInvetoryWithSlots(invetoryObject) {
+    for(let i = 0; i < invetoryObject.basicSlots.length; i++)invetoryObject.basicSlots[i] = new Slot(i);
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1SSyA":[function(require,module,exports) {
@@ -857,13 +975,15 @@ parcelHelpers.export(exports, "Player", ()=>Player
 var _creatureJs = require("./lib/creature.js");
 var _hitboxJs = require("./hitbox.js");
 class Player extends _creatureJs.Creature {
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition){
+    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, ammunition, magicEnergy){
         super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
+        this.ammunition = ammunition;
         this.movingDirectionAxisX;
         this.movingDirectionAxisY;
         this.targetX;
         this.targetY;
         this.isMovingX;
+        this.isMovingY;
         this.isMovingY;
     }
     drawPlayer(ctx) {
@@ -904,11 +1024,12 @@ class Player extends _creatureJs.Creature {
         }
     }
     playerAttack(e, collision, objective, generalTimer, playerAmmunition) {
-        const { weapon  } = this;
+        const { weapon , ammunition  } = this;
         //console.log('CTRL:',e.ctrlKey, collision);
         //console.log('Key Code: ' + e.key, 'Type: '+weapon.type);
+        //console.log(collision);
         if (e.key === 'q' && collision && weapon.type === 'melee') weapon.attack(this, objective, generalTimer);
-        else if (!collision && weapon.type === 'distance' && e.ctrlKey) weapon.attack(this, objective, generalTimer, e, playerAmmunition);
+        else if (!collision && weapon.type === 'distance' && e.button === 2) weapon.attack(this, objective, generalTimer, e, ammunition, 'player');
     }
 }
 
@@ -948,6 +1069,7 @@ class Weapon {
         this.type = type;
         this.bulletSpeed = bulletSpeed;
         this.distanceOptions = distanceOptions;
+        this.distance = 500;
     }
     reload(generalTimer, ammunition) {
         const { distanceOptions , type  } = this;
@@ -965,19 +1087,27 @@ class Weapon {
             }
         }
     }
-    attack(wieldingWeapons, objective, generalTimer, e, playerAmmunition) {
+    attack(wieldingWeapons, objective, generalTimer, e, ammunition, ownerAttack) {
         const { type , minDmg , maxDmg , bulletSpeed  } = this;
         const { x , y  } = wieldingWeapons;
+        console.log(objective.y, wieldingWeapons.y);
         if (type === 'melee') {
             const givenDmg = Math.floor(Math.random() * (this.maxDmg - this.minDmg + 1) + this.minDmg);
             objective.hp -= givenDmg;
         } else if (type === 'distance') {
-            if (this.distanceOptions[0] != 0 && !this.distanceOptions[2]) {
-                if (bulletSpeed != 0) generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
-                else generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
-                this.distanceOptions[0]--;
+            if (this.distanceOptions[0] != 0 && !this.distanceOptions[2] || this.distanceOptions[0] === 'infinity') {
+                if (bulletSpeed != 0) {
+                    if (ownerAttack === 'player') generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + ',owner:' + ownerAttack + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+                    else if (ownerAttack === 'enemy') {
+                        generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:' + bulletSpeed + ',minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + objective.x + ',targetY:' + objective.y + ',owner:' + ownerAttack + 'Id-' + wieldingWeapons.id + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+                        console.log('WOW2', objective);
+                    }
+                } else generalTimer.listOfTicks.push(new _timeJs.Tick('Creating a Bullet{x:' + x + ',y:' + y + ',width:20,height:20,speed:4,minDmg:' + minDmg + ',maxDmg:' + maxDmg + ',targetX:' + e.offsetX + ',targetY:' + e.offsetY + ',owner:' + ownerAttack + '}', generalTimer.generalGameTime, generalTimer.generalGameTime + this.speedLightAttack));
+                if (this.distanceOptions[0] !== 'infinity') {
+                    if (ownerAttack !== 'enemy') this.distanceOptions[0]--;
+                }
             }
-            if (!this.distanceOptions[2] && this.distanceOptions[0] === 0) this.reload(generalTimer, playerAmmunition);
+            if (!this.distanceOptions[2] && this.distanceOptions[0] === 0) this.reload(generalTimer, ammunition);
         }
     }
 }
@@ -988,7 +1118,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Bullet", ()=>Bullet
 );
 class Bullet {
-    constructor(x, y, width, height, hitbox, speed, minDmg, maxDmg, targetX, targetY, distance){
+    constructor(x, y, width, height, hitbox, speed, minDmg, maxDmg, targetX, targetY, distance, owner){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -1002,6 +1132,7 @@ class Bullet {
         this.targetX = targetX;
         this.targetY = targetY;
         this.distance = distance;
+        this.owner = owner;
     }
     drawBullet(ctx) {
         const { x , y , width , height  } = this;
@@ -1011,8 +1142,11 @@ class Bullet {
     checkTheDirection(wieldingWeapon) {
         const { targetX , targetY  } = this;
         const { x , y  } = wieldingWeapon;
-        this.movingDirectionAxisX = x > targetX ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
+        //TODO : 1055 < 
+        this.movingDirectionAxisX = x < targetX ? this.movingDirectionAxisX = 'Right' : this.movingDirectionAxisX = 'Left';
         this.movingDirectionAxisY = y > targetY ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
+        console.log(this, wieldingWeapon.id);
+        console.log(this.movingDirectionAxisX);
     }
     move() {
         const { x , y , movingDirectionAxisX , movingDirectionAxisY , speed , targetX , targetY  } = this;
@@ -1051,17 +1185,23 @@ var _timeJs = require("./lib/time.js");
 var _chestJs = require("./chest.js");
 var _hitboxJs = require("./hitbox.js");
 class Enemy extends _creatureJs.Creature {
-    constructor(x, y, width, height, hitbox, weapon, hp, movingSpeed, defendChance, drop, dropAmount){
+    constructor(id, x, y, width, height, hitbox, weapon, hp, movingSpeed, defendChance, drop, dropAmount, inteligence, ammunition){
         super(x, y, width, height, hitbox, weapon, hp, movingSpeed);
+        this.id = id;
         this.objectiveX;
         this.objectiveY;
         this.defendChance = defendChance;
         this.drop = drop;
         this.dropAmount = dropAmount;
+        this.inteligence = inteligence;
         this.isAlive = true;
         this.aiState = 'quest';
+        this.secondAiState = 'none';
         this.walkingDirectionX = 'none';
         this.walkingDirectionY = 'none';
+        this.hitboxActive = true;
+        this.levelOfThreat = 0;
+        this.ammunition = ammunition;
     }
     drawEnemy(ctx, color) {
         const { x , y , width , height , isAlive  } = this;
@@ -1069,24 +1209,26 @@ class Enemy extends _creatureJs.Creature {
         if (!isAlive) ctx.fillStyle = 'black';
         else {
             ctx.fillRect(x, y, width, height);
-            _mainJs.drawText(x + 5, y - 5, 'Hp:' + this.hp, 'black', 17);
+            _mainJs.drawText(x + 5, y - 5, 'Hp:' + this.hp + ' ' + this.id, 'black', 17);
         }
     }
     wherePlayer(playerObject) {
-        const { x , y  } = this;
-        if (playerObject.x > x) {
-            this.walkingDirectionX = 'Right';
-            this.objectiveX = playerObject.x;
-        } else {
-            this.walkingDirectionX = 'Left';
-            this.objectiveX = playerObject.x;
-        }
-        if (playerObject.y > y) {
-            this.walkingDirectionY = 'Down';
-            this.objectiveY = playerObject.y;
-        } else {
-            this.walkingDirectionY = 'Up';
-            this.objectiveY = playerObject.y;
+        const { x , y , aiState  } = this;
+        if (aiState === 'quest') {
+            if (playerObject.x > x) {
+                this.walkingDirectionX = 'Right';
+                this.objectiveX = playerObject.x;
+            } else {
+                this.walkingDirectionX = 'Left';
+                this.objectiveX = playerObject.x;
+            }
+            if (playerObject.y > y) {
+                this.walkingDirectionY = 'Down';
+                this.objectiveY = playerObject.y;
+            } else {
+                this.walkingDirectionY = 'Up';
+                this.objectiveY = playerObject.y;
+            }
         }
     }
     moveToPlayer(playerObject) {
@@ -1096,42 +1238,171 @@ class Enemy extends _creatureJs.Creature {
         if (walkingDirectionY === 'Up' && y != playerObject.y) this.y -= movingSpeed;
         else if (walkingDirectionY === 'Down' && y != playerObject.y) this.y += movingSpeed;
     }
+    moveTo(generalTimer) {
+        const { x , y , walkingDirectionX , walkingDirectionY , movingSpeed , aiState  } = this;
+        let bonusSpeed = 1;
+        if (aiState === 'dodge') bonusSpeed = 1.5;
+        if (walkingDirectionX === 'Left') this.x -= movingSpeed;
+        else if (walkingDirectionX === 'Right') this.x += movingSpeed;
+        if (walkingDirectionY === 'Up') {
+            this.y -= movingSpeed * bonusSpeed;
+            if (this.y <= this.objectiveY) {
+                this.walkingDirectionY = 'None';
+                this.aiState = 'quest';
+                this.secondAiState = 'none';
+                this.deleteLastReloadingTick(generalTimer);
+            }
+        } else if (walkingDirectionY === 'Down') {
+            this.y += movingSpeed * bonusSpeed;
+            if (this.y < this.objectiveY) {
+                this.walkingDirectionY = 'None';
+                this.aiState = 'quest';
+                this.secondAiState = 'none';
+                this.deleteLastReloadingTick(generalTimer);
+            }
+        }
+    }
+    deleteLastReloadingTick(generalTimer) {
+        for (const thisTick of generalTimer.listOfTicks){
+            if (thisTick.nameOfTick === 'Reloading Enemy Distance Weapon EnemyId:' + this.id) {
+                if (thisTick.done && !thisTick.old) {
+                    thisTick.old = true;
+                    console.log(thisTick.old);
+                    break;
+                }
+            }
+        }
+    }
     afterDeath(chests) {
         this.isAlive = false;
         const { x , y , drop , dropAmount  } = this;
         chests.chests.push(new _chestJs.Chest(x, y, 30, 30, new _hitboxJs.Hitbox(x, y, 30, 30), drop));
         console.log(chests);
+        this.hitboxActive = false;
     }
-    enemyAi(attackList, playerObject, generalTimer, chests) {
-        const { isAlive , aiState , weapon , hp  } = this;
+    threats(bullets, playerObject) {
+        const { x , y , width , height  } = this;
+        this.levelOfThreat = 0;
+        let xAxis = false;
+        let yAxis = false;
+        let distance = false;
+        //BulletThreats
+        if (this.inteligence >= 1) {
+            //console.log(this.levelOfThreat);
+            for (const bullet of bullets)if (bullet.owner === 'player') {
+                if (bullet.movingDirectionAxisX === 'Left' && bullet.x > x || bullet.movingDirectionAxisX === 'Right' && bullet.x < x) {
+                    this.levelOfThreat += 1;
+                    xAxis = true;
+                }
+                if (bullet.x - x <= 0) {
+                    if (bullet.distance >= x - bullet.x - 25) {
+                        this.levelOfThreat += 1;
+                        distance = true;
+                    }
+                } else if (bullet.distance >= bullet.x - x - 25) {
+                    this.levelOfThreat += 1;
+                    distance = true;
+                }
+                if (bullet.movingDirectionAxisY === 'Up' && bullet.y > y || bullet.movingDirectionAxisY === 'Down' && bullet.y < y || bullet.movingDirectionAxisY === 'None' && distance) {
+                    this.levelOfThreat += 1;
+                    yAxis = true;
+                }
+                if (distance && xAxis && bullet.movingDirectionAxisY === 'None') this.levelOfThreat += 1;
+                if (this.levelOfThreat >= 3) {
+                    /*this.x = playerObject.x + playerObject.width * 2;
+                        this.y = playerObject.y + playerObject.height * 2;*/ this.aiState = 'dodge';
+                    if (bullet.movingDirectionAxisY === 'Down') {
+                        this.objectiveY = y - height * 1.2;
+                        this.walkingDirectionY = 'Up';
+                    } else if (bullet.movingDirectionAxisY === 'Up') {
+                        this.objectiveY = y + height * 1.2;
+                        this.walkingDirectionY = 'Down';
+                    } else {
+                        this.objectiveY = y + height;
+                        this.walkingDirectionY = 'Down';
+                    }
+                }
+            }
+        }
+    //BulletThreats
+    }
+    checkCanShoot(playerObject, generalTimer) {
+        const { x , y , weapon , ammunition , secondAiState  } = this;
+        const { x2 , y2  } = playerObject;
+        //250 < x2
+        if (x < playerObject.x) {
+            //I am a left side from player
+            if (weapon.distance >= y - playerObject.y + (playerObject.x - x) - 50) this.aiState = 'shooting';
+            else {
+                this.aiState = 'quest';
+                this.secondAiState = 'none';
+                this.deleteLastReloadingTick(generalTimer);
+            }
+        } else if (x > playerObject.x) {
+            //I am a right side from player
+            if (weapon.distance >= playerObject.y - y + (x - playerObject.x) - 50) this.aiState = 'shooting';
+            else {
+                this.aiState = 'quest';
+                this.secondAiState = 'none';
+                this.deleteLastReloadingTick(generalTimer);
+            }
+        }
+    }
+    enemyAi(attackList, playerObject, generalTimer, chests, bullets) {
+        const { isAlive , aiState , secondAiState , weapon , hp , ammunition  } = this;
         const { listOfTicks  } = generalTimer;
+        //console.log(secondAiState);
         if (hp <= 0) {
             if (isAlive) this.afterDeath(chests);
             this.isAlive = false;
         } else if (isAlive) {
+            this.threats(bullets, playerObject);
             this.wherePlayer(playerObject);
             if (aiState === 'quest') {
                 this.moveToPlayer(playerObject);
                 attackList.pop();
-            //generalTimer.listOfTicks.pop();
-            //console.log('The Last Tick has be deleted');
-            } else if (aiState === 'toattack') {
-                if (attackList[attackList.length - 1] !== 'EnemyLightAttack') attackList.push('EnemyLightAttack');
-                var attackIs = false;
-                //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
-                while(!attackIs){
-                    for(let i = 0; i < listOfTicks.length; i++)if (listOfTicks[i].nameOfTick === 'EnemyLightAttack') {
-                        if (listOfTicks[i].done && !listOfTicks[i].old) {
-                            attackList.pop();
-                            this.weapon.attack(this, playerObject, generalTimer);
-                            generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack', generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
-                            listOfTicks[i].old = true;
+            } else if (aiState === 'dodge') this.moveTo(generalTimer);
+            else if (aiState === 'toattack') {
+                if (weapon.type === 'melee') {
+                    let attackIs = false;
+                    //Szukanie ataku i jeżeli jest na liście atak i jest on skończony i nie stary to wykonaj atak:
+                    while(!attackIs)for(let i = 0; i < listOfTicks.length; i++){
+                        console.log('WOWOOW!');
+                        if (listOfTicks[i].nameOfTick === 'EnemyLightAttack EnemyId:' + this.id) {
+                            if (listOfTicks[i].done && !listOfTicks[i].old) {
+                                attackList.pop();
+                                this.weapon.attack(this, playerObject, generalTimer);
+                                generalTimer.listOfTicks.push(new _timeJs.Tick('EnemyLightAttack EnemyId:' + this.id, generalTimer.generalGameTime, generalTimer.generalGameTime + this.weapon.speedLightAttack));
+                                listOfTicks[i].old = true;
+                                attackIs = true;
+                                i += listOfTicks.length + 1;
+                            }
                             attackIs = true;
-                            i += listOfTicks.length + 1;
                         }
-                        attackIs = true;
                     }
                 }
+                if (attackList[attackList.length - 1] !== 'EnemyLightAttack EnemyId:' + this.id) attackList.push('EnemyLightAttack' + this.id);
+            }
+            if (aiState === 'shooting' && secondAiState === 'icanshoot?') this.secondAiState = 'reloading';
+            if (secondAiState === 'icanshoot?') this.checkCanShoot(playerObject, generalTimer);
+            else if (secondAiState === 'waitforreaload') for (const thisTick of listOfTicks){
+                if (thisTick.nameOfTick === 'Reloading Enemy Distance Weapon EnemyId:' + this.id) {
+                    if (thisTick.done && !thisTick.old) {
+                        this.secondAiState = 'shoot';
+                        thisTick.old = true;
+                        console.log(listOfTicks);
+                        this.checkCanShoot(playerObject, generalTimer);
+                        break;
+                    }
+                }
+            }
+            else if (secondAiState === 'shoot' && aiState === 'shooting') {
+                weapon.attack(this, playerObject, generalTimer, undefined, ammunition, 'enemy');
+                this.secondAiState = 'reloading';
+            } else if (secondAiState === 'reloading' && aiState === 'shooting') {
+                generalTimer.listOfTicks.push(new _timeJs.Tick('Reloading Enemy Distance Weapon EnemyId:' + this.id, generalTimer.generalGameTime, generalTimer.generalGameTime + 500));
+                this.secondAiState = 'waitforreaload';
+            //                    this.checkCanShoot(playerObject, generalTimer);
             }
         }
     }
@@ -1156,10 +1427,10 @@ class Chest {
         this.isOpen = isOpen;
     }
     drawChest(ctx) {
-        const { x , y , width , height , icon  } = this;
+        const { x , y , width , height , icon , isOpen  } = this;
         if (icon === 'item') ctx.fillStyle = '#239db0';
         else if (icon === 'chest') ctx.fillStyle = '#b0531e';
-        ctx.fillRect(x, y, width, height);
+        if (!isOpen) ctx.fillRect(x, y, width, height);
     }
     open(opener, openerInvetory) {
         const { isOpen , content  } = this;
@@ -1188,12 +1459,79 @@ parcelHelpers.export(exports, "Item", ()=>Item
 );
 class Item {
     constructor(name, price, type, rarity, effect, toBuyInShop){
-        this.ItemName = name;
-        this.ItemPrice = price;
-        this.ItemType = type;
-        this.ItemRarity = rarity; //(0)ordinary,(1)unusual,(2)unusual,(3)epic,(4)legendary
-        this.ItemEffect = effect;
+        this.itemName = name;
+        this.itemPrice = price;
+        this.itemType = type;
+        this.itemRarity = rarity; //(0)ordinary,(1)unusual,(2)unusual,(3)epic,(4)legendary
+        this.itemEffect = effect;
         this.toBuyInShop = toBuyInShop;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5GGKT":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "KeyboardInput", ()=>KeyboardInput
+);
+class KeyboardInput {
+    constructor(){
+    }
+    readInput(e, keycode, collision) {
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dZNi5":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+//Languages
+parcelHelpers.export(exports, "loadMenuLanguage", ()=>loadMenuLanguage
+);
+parcelHelpers.export(exports, "polishLanguageMenuUi", ()=>polishLanguageMenuUi
+);
+parcelHelpers.export(exports, "englishLanguageMenuUi", ()=>englishLanguageMenuUi
+);
+parcelHelpers.export(exports, "langConvert", ()=>langConvert
+);
+function loadMenuLanguage(menu, languageMenu) {
+    return languageMenu;
+}
+function langConvert(text, lang) {
+    if (lang === 'PL' || lang === 'pl') {
+        if (text === 'distance') return 'dystansowa';
+        else if (text === 'melee') return 'wręcz';
+        else if (text === 'empty') return 'pusty';
+    }
+}
+//Languages
+const polishLanguageMenuUi = [
+    'Życie:',
+    'Twoja broń:',
+    'Typ Broni:',
+    'Przeładowywanie...'
+];
+let englishLanguageMenuUi = [
+    'Hp:',
+    'Your weapon:',
+    'Type:',
+    'Reloading...'
+];
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4Vft0":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Spell", ()=>Spell
+);
+class Spell {
+    constructor(requiredMagicEnergy, type, action, availablesObjects, reload){
+        this.requiredMagicEnergy = requiredMagicEnergy;
+        this.type = type;
+        this.action = action;
+        this.availablesObjects = availablesObjects;
+        this.reload = reload;
+        if (type === 'dmg') {
+            this.minDmg;
+            this.maxDmg;
+        }
     }
 }
 

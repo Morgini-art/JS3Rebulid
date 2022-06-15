@@ -13,6 +13,7 @@ body {
     background-color: lightblue;
     border-radius: 6px;
     border: 6px #5798ba solid;
+    
 }
 
 h1 {
@@ -21,8 +22,7 @@ h1 {
 }
 
 a {
-    width: 120px;
-    display: block;
+    width: 580px;
     margin: auto;
     text-decoration: none;
     font-size: 22px;

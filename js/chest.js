@@ -11,14 +11,16 @@ class Chest {
     }
     
     drawChest(ctx) {
-        const {x, y, width, height, icon} = this;
+        const {x, y, width, height, icon, isOpen} = this;
         if (icon === 'item') {
             ctx.fillStyle = '#239db0';
         } else if (icon === 'chest') {
             ctx.fillStyle = '#b0531e';
         }
         
-        ctx.fillRect(x, y, width, height);
+        if (!isOpen) {
+            ctx.fillRect(x, y, width, height);
+        }
     }
     
     

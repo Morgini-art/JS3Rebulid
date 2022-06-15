@@ -1,5 +1,5 @@
 class Bullet {
-    constructor(x, y, width, height, hitbox, speed, minDmg, maxDmg, targetX, targetY, distance) {
+    constructor(x, y, width, height, hitbox, speed, minDmg, maxDmg, targetX, targetY, distance, owner) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -13,6 +13,7 @@ class Bullet {
         this.targetX = targetX;
         this.targetY = targetY;
         this.distance = distance;
+        this.owner = owner;
     }
 
     drawBullet(ctx) {
@@ -30,9 +31,14 @@ class Bullet {
         const {targetX, targetY} = this;
         const {x, y} = wieldingWeapon;
         
-        this.movingDirectionAxisX = (x > targetX) ? this.movingDirectionAxisX = 'Left' : this.movingDirectionAxisX = 'Right';
+                              //TODO : 1055 < 
+        this.movingDirectionAxisX = (x < targetX) ? this.movingDirectionAxisX = 'Right' : this.movingDirectionAxisX = 'Left';
 
         this.movingDirectionAxisY = (y > targetY) ? this.movingDirectionAxisY = 'Up' : this.movingDirectionAxisY = 'Down';
+        
+        
+        console.log(this, wieldingWeapon.id);
+        console.log(this.movingDirectionAxisX);
     }
     
     move() {
